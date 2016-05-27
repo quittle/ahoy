@@ -1,0 +1,38 @@
+package(
+    default_testonly = True,
+    default_visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "gmock",
+    srcs = glob(
+        include = ["googlemock/src/*.cc"],
+        exclude = [
+            "googlemock/src/gmock-all.cc",
+        ],
+    ),
+    hdrs = glob([
+        "googlemock/include/**/*.h",
+    ]),
+    includes = [
+        "googlemock/include",
+    ],
+    deps = [":gtest"],
+)
+
+cc_library(
+    name = "gtest",
+    srcs = glob(
+        include = ["googletest/src/*.cc"],
+        exclude = ["googletest/src/gtest-all.cc"],
+    ),
+    hdrs = glob([
+        "googletest/include/**/*.h",
+        "googletest/src/*.h",
+    ]),
+    includes = [
+        "googletest",
+        "googletest/include",
+    ],
+    linkopts = ["-pthread"],
+)
