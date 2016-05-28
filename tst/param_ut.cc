@@ -1,8 +1,8 @@
 #include "ahoy/param.h"
 
 #include <algorithm>
+#include <set>
 #include <string>
-#include <unordered_set>
 
 #include <gtest/gtest.h>
 
@@ -16,10 +16,10 @@ const char kLong []= "2147483647";
 const long kLongValue = 2147483647L;
 const char kBoolIntTrue[] = "1";
 const char kBoolIntFalse[] = "0";
-const std::unordered_set<std::string> kBoolsTrue = {
+const std::set<std::string> kBoolsTrue = {
     "true", "TRUE", "t", "y", "Yes"
 };
-const std::unordered_set<std::string> kBoolsFalse = {
+const std::set<std::string> kBoolsFalse = {
     "false", "FALSE", "F", "NO"
 };
 

@@ -1,5 +1,7 @@
 #include "ahoy/arg.h"
 
+#include <set>
+
 #include <gtest/gtest.h>
 
 namespace {

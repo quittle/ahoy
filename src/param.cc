@@ -1,12 +1,12 @@
 #include "ahoy/param.h"
 
 #include <algorithm>
+#include <set>
 #include <stdexcept>
-#include <unordered_set>
 
 namespace {
 
-const std::unordered_set<std::string> kBoolsTrue = {
+const std::set<std::string> kBoolsTrue = {
     "true",
     "t",
     "1",
@@ -14,7 +14,7 @@ const std::unordered_set<std::string> kBoolsTrue = {
     "yes"
 };
 
-const std::unordered_set<std::string> kBoolsFalse = {
+const std::set<std::string> kBoolsFalse = {
     "false",
     "f",
     "0",
