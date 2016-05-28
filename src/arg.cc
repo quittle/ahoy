@@ -18,6 +18,14 @@ Arg::Arg(const std::set<std::string>& short_forms,
 
 Arg::~Arg() {}
 
+bool Arg::HasShortForm(const std::string& form) const {
+    return short_forms_.find(form) != short_forms_.end();
+}
+
+bool Arg::HasLongForm(const std::string& form) const {
+    return long_forms_.find(form) != long_forms_.end();
+}
+
 const std::set<std::string>& Arg::short_forms() const {
     return short_forms_;
 }

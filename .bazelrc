@@ -6,7 +6,7 @@ build --cwarn pedantic
 build --cwarn overloaded-virtual
 build --cwarn sequence-point
 build --cwarn unused
-build --cwarn unused-variable
+build --cxxopt -pedantic-errors
 
 # Disable warnings
 build --cxxopt -Wno-unused-function

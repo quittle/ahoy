@@ -21,6 +21,16 @@ class ArgTest : public ::testing::Test {
     const Arg arg_;
 };
 
+TEST_F(ArgTest, HasShortForm) {
+    EXPECT_TRUE(arg_.HasShortForm("s"));
+    EXPECT_FALSE(arg_.HasShortForm("long"));
+}
+
+TEST_F(ArgTest, HasLongForms) {
+    EXPECT_FALSE(arg_.HasLongForm("s"));
+    EXPECT_TRUE(arg_.HasLongForm("long"));
+}
+
 TEST_F(ArgTest, ShortForms) {
     EXPECT_EQ(kShortForms, arg_.short_forms());
 }

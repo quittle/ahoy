@@ -15,6 +15,11 @@ class Arg {
             const std::string& default_value);
     virtual ~Arg();
 
+    // Returns true if |form| is in it's set of short forms
+    bool HasShortForm(const std::string& form) const;
+    // Returns true if |form| is in it's set of long forms
+    bool HasLongForm(const std::string& form) const;
+
     const std::set<std::string>& short_forms() const;
     const std::set<std::string>& long_forms() const;
     bool required() const;

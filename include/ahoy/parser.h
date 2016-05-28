@@ -21,15 +21,13 @@ class Parser {
   public:
     explicit Parser<T>(const std::map<T, Arg>& args) : args_(args) {}
 
-    // Parses the args from a standard main function
+    // Parses the args from a standard main function.
+    // Note: Duplicate fields will use first found field
     ParseResult<T> Parse(const int argc, char const * const argv[]) const {
         char const * const kEquals = "=";
         const size_t kEqualsLen = strlen(kEquals);
         const char kHyphen = '-';
 
-        const char kStateInit = 0;
-        const char kStateSeekingKey = 0;
-        const char kStateSeekingValue = 1;
         const char kArgSizeInit = -1;
         const char kArgSizeShort = 0;
         const char kArgSizeLong = 1;
@@ -37,13 +35,17 @@ class Parser {
         std::map<T, Param> params;
         std::vector<std::string> errors;
 
+        if (argc < 1) {
+            errors.emplace_back(std::string() +
+                    "Missing executable from args. Args length: " + std::to_string(argc));
+        }
+
         // Skip the first arg, which is executable name
         for (int i = 1; i < argc; i++) {
             char const * const arg = argv[i];
-            const size_t arg_len = strlen(arg);
             if (arg[0] != kHyphen) { // Regular argument
                 // Not supported yet
-                errors.emplace_back(std::string("Regular args found: ") + arg);
+                errors.emplace_back(std::string() + "Regular args found: " + arg);
                 continue;
             } else { // - or -- argument
                 const char* dehyphenated_arg = nullptr;
@@ -58,7 +60,7 @@ class Parser {
                     arg_size = kArgSizeLong;
                 } else {
                     // Too many hyphens `---foo`
-                    errors.emplace_back(std::string("Too many hyphens for arg: ") + arg);
+                    errors.emplace_back(std::string() + "Too many hyphens for arg: " + arg);
                     continue;
                 }
 
@@ -69,7 +71,9 @@ class Parser {
                     i++;
                     if (i >= argc) {
                         // Ran out of args to parse when looking for a value
-                        errors.emplace_back(std::string("Ran out of arguments to parse but was looking for the value of ") + arg);
+                        errors.emplace_back(std::string() +
+                                "Ran out of arguments to parse but was looking for the value of " +
+                                arg);
                         continue;
                     }
                     key = std::string(dehyphenated_arg);
@@ -85,16 +89,24 @@ class Parser {
                 for (const auto& entry : args_) {
                     const T& type_key = entry.first;
                     const Arg& arg = entry.second;
-                    if ((arg.short_forms().find(key) != arg.short_forms().end() && arg_size == kArgSizeShort) ||
-                            (arg.long_forms().find(key) != arg.long_forms().end() && arg_size == kArgSizeLong)) {
-                        params.insert({type_key, value});
+                    if ((arg_size == kArgSizeShort && arg.HasShortForm(key)) ||
+                            (arg_size == kArgSizeLong && arg.HasLongForm(key))) {
+                        if (params.find(type_key) == params.end()) {
+                            params.insert({type_key, value});
+                        } else {
+                            errors.emplace_back(std::string() + "Duplicate of arg found. Name: " +
+                                    key);
+                        }
                         arg_was_expected = true;
                         break;
                     }
                 }
 
                 if (!arg_was_expected) {
-                    errors.emplace_back(std::string("Arg was unexpected because it has an unexpected name or was expected to be - or -- but was other. Name: \"") + key + + "\" Value: \"" + value + "\"");
+                    errors.emplace_back(std::string() +
+                            "Arg was unexpected because it has an unexpected name or was expected "
+                            "to be - or -- but was other. Name: \"" + key +
+                            "\" Value: \"" + value + "\"");
                     continue;
                 }
             }
@@ -103,7 +115,9 @@ class Parser {
         for (const auto& entry : args_) {
             if (params.find(entry.first) == params.end()) {
                 if (entry.second.required()) {
-                    errors.emplace_back(std::string("Missing required field: [") + Join(entry.second.short_forms()) + "] [" + Join(entry.second.long_forms()) + "]");
+                    errors.emplace_back(std::string() + "Missing required field: [" +
+                            Join(entry.second.short_forms()) + "] [" +
+                            Join(entry.second.long_forms()) + "]");
                     continue;
                 } else {
                     params.insert({entry.first, entry.second.default_value()});

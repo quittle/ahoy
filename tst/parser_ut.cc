@@ -24,6 +24,14 @@ TEST(Parser, Template) {
     Parser<std::string>({{ "string", arg }});
 }
 
+TEST(Parser, MissingExecutable) {
+    char const * const * const args = nullptr;
+    const ParseResult<int> result = Parser<int>({}).Parse(0, args);
+    EXPECT_FALSE(result);
+    EXPECT_EQ(0, result.params().size());
+    EXPECT_EQ(1, result.errors().size());
+}
+
 TEST(Parser, Empty) {
     char const * args[1] = { "" };
     const ParseResult<int> result_empty = Parser<int>({}).Parse(1, args);
@@ -132,7 +140,16 @@ TEST(Parser, DefaultValue) {
     EXPECT_EQ(0, result.errors().size());
 }
 
-TEST(Parser, Dupes) {}
+TEST(Parser, Duplicates) {
+    char const * const args[4] = { kExecutable, "-f", "value", "--field=value_2" };
+    const ParseResult<int> result =
+            Parser<int>({{ 0, {{"f"}, {"field"}, true, kDescription, kDefaultValue }}})
+                    .Parse(4, args);
+    EXPECT_FALSE(result);
+    const std::map<int, Param> expected_params = {{ 0, "value" }};
+    EXPECT_EQ(expected_params, result.params());
+    EXPECT_EQ(1, result.errors().size());
+}
 
 TEST(Parser, Multiple) {
     char const * const args[6] =
@@ -141,8 +158,8 @@ TEST(Parser, Multiple) {
         { 0, {{"f"}, {"long-f"}, false, kDescription, kDefaultValue }},
         { 1, {{"b"}, {"bar"}, true, kDescription, kDefaultValue }},
         { 2, {{"m"}, {"missing"}, false, kDescription, kDefaultValue }},
-        { 3, {{"h"}, {"hey"}, true, kDescription, kDefaultValue }}
-    }).Parse(1, args);
+        { 3, {{"hey"}, {"hey"}, true, kDescription, kDefaultValue }}
+    }).Parse(6, args);
     const std::map<int, Param> expected_params = {
         { 0, "foo" },
         { 1, "baz boop" },
