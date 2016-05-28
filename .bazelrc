@@ -1,3 +1,17 @@
+# Enable warnings
+build --cwarn all
+build --cwarn error
+build --cwarn extra
+build --cwarn pedantic
+build --cwarn overloaded-virtual
+build --cwarn sequence-point
+build --cwarn unused
+build --cwarn unused-variable
+
+# Disable warnings
+build --cxxopt -Wno-unused-function
+
+# Add test configuration
 test --test_output all
 test --test_verbose_timeout_warnings
 test --cache_test_results=no

@@ -1,27 +1,28 @@
 #ifndef AHOY_AHOY_PARSER_H
 #define AHOY_AHOY_PARSER_H
 
+#include <algorithm>
 #include <cstring>
+#include <map>
 #include <set>
-#include <unordered_map>
+#include <vector>
 
 #include "ahoy/arg.h"
 #include "ahoy/param.h"
+#include "ahoy/parse_result.h"
 
-
+// TODO: Remove
 #include <iostream>
+
 namespace ahoy {
 
 template<typename T>
 class Parser {
   public:
-    typedef std::unordered_map<T, Param> Parameters;
+    explicit Parser<T>(const std::map<T, Arg>& args) : args_(args) {}
 
-    explicit Parser<T>(const std::unordered_map<T, Arg>& args) : args_(args) {}
-
-    // Parses the args from main into |out|. Returns true if successful or false if not
-    // If unable to parse, |out| will be unmodified
-    bool Parse(const int argc, char const * const argv[], Parameters& out) const {
+    // Parses the args from a standard main function
+    ParseResult<T> Parse(const int argc, char const * const argv[]) const {
         char const * const kEquals = "=";
         const size_t kEqualsLen = strlen(kEquals);
         const char kHyphen = '-';
@@ -33,17 +34,17 @@ class Parser {
         const char kArgSizeShort = 0;
         const char kArgSizeLong = 1;
 
-        Parameters ret;
-        std::unordered_map<std::string, std::string> short_args;
-        std::unordered_map<std::string, std::string> long_args;
+        std::map<T, Param> params;
+        std::vector<std::string> errors;
+
         // Skip the first arg, which is executable name
         for (int i = 1; i < argc; i++) {
             char const * const arg = argv[i];
             const size_t arg_len = strlen(arg);
             if (arg[0] != kHyphen) { // Regular argument
                 // Not supported yet
-                std::cout << "Regular args found" << std::endl;
-                return false;
+                errors.emplace_back(std::string("Regular args found: ") + arg);
+                continue;
             } else { // - or -- argument
                 const char* dehyphenated_arg = nullptr;
                 char arg_size = kArgSizeInit;
@@ -57,8 +58,8 @@ class Parser {
                     arg_size = kArgSizeLong;
                 } else {
                     // Too many hyphens `---foo`
-                    std::cout << "Too many hyphens" << std::endl;
-                    return false;
+                    errors.emplace_back(std::string("Too many hyphens for arg: ") + arg);
+                    continue;
                 }
 
                 std::string key, value;
@@ -68,8 +69,8 @@ class Parser {
                     i++;
                     if (i >= argc) {
                         // Ran out of args to parse when looking for a value
-                        std::cout << "Can't find equals but not enough args" << std::endl;
-                        return false;
+                        errors.emplace_back(std::string("Ran out of arguments to parse but was looking for the value of ") + arg);
+                        continue;
                     }
                     key = std::string(dehyphenated_arg);
                     value = argv[i];
@@ -80,48 +81,52 @@ class Parser {
 
                 std::cout << "Value: " << value << std::endl;
 
-                bool found_place = false;
+                bool arg_was_expected = false;
                 for (const auto& entry : args_) {
                     const T& type_key = entry.first;
                     const Arg& arg = entry.second;
                     if ((arg.short_forms().find(key) != arg.short_forms().end() && arg_size == kArgSizeShort) ||
                             (arg.long_forms().find(key) != arg.long_forms().end() && arg_size == kArgSizeLong)) {
-                        ret.insert({type_key, Param(value)});
-                        found_place = true;
+                        params.insert({type_key, value});
+                        arg_was_expected = true;
                         break;
                     }
                 }
 
-                if (!found_place) {
-                    std::cout << "didn't find place" << std::endl;
-                    // Arg not in params or size doesn't match
-                    return false;
+                if (!arg_was_expected) {
+                    errors.emplace_back(std::string("Arg was unexpected because it has an unexpected name or was expected to be - or -- but was other. Name: \"") + key + + "\" Value: \"" + value + "\"");
+                    continue;
                 }
             }
         }
 
         for (const auto& entry : args_) {
-            if (ret.find(entry.first) == ret.end()) {
+            if (params.find(entry.first) == params.end()) {
                 if (entry.second.required()) {
-                    std::cout << "Required field missing";
-                    return false;
+                    errors.emplace_back(std::string("Missing required field: [") + Join(entry.second.short_forms()) + "] [" + Join(entry.second.long_forms()) + "]");
+                    continue;
                 } else {
-                    ret.insert({entry.first, Param(entry.second.default_value())});
+                    params.insert({entry.first, entry.second.default_value()});
                 }
             }
         }
 
-        for (const auto& entry : ret) {
+        for (const auto& entry : params) {
             std::cout << entry.first << " " << entry.second.AsString() << std::endl;
         }
 
-        out = ret;
-
-        return true;
+        return ParseResult<T>(params, errors);
     }
 
   private:
-    const std::unordered_map<T, Arg> args_;
+    const std::map<T, Arg> args_;
+
+    std::string Join(std::set<std::string> set) const {
+        return std::accumulate(set.begin(), set.end(), std::string(),
+                [](const std::string& prev, const std::string& item) {
+                    return std::string(prev.empty() ? "" : ", ") + item;
+                });
+    }
 };
 
 } // namespace ahoy

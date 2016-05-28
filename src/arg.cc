@@ -1,12 +1,12 @@
 #include "ahoy/arg.h"
 
 #include <algorithm>
-#include <unordered_set>
+#include <set>
 
 namespace ahoy {
 
-Arg::Arg(const std::unordered_set<std::string>& short_forms,
-            const std::unordered_set<std::string>& long_forms,
+Arg::Arg(const std::set<std::string>& short_forms,
+            const std::set<std::string>& long_forms,
             const bool required,
             const std::string& description,
             const std::string& default_value) :
@@ -18,11 +18,11 @@ Arg::Arg(const std::unordered_set<std::string>& short_forms,
 
 Arg::~Arg() {}
 
-const std::unordered_set<std::string>& Arg::short_forms() const {
+const std::set<std::string>& Arg::short_forms() const {
     return short_forms_;
 }
 
-const std::unordered_set<std::string>& Arg::long_forms() const {
+const std::set<std::string>& Arg::long_forms() const {
     return long_forms_;
 }
 

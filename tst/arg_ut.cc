@@ -4,8 +4,8 @@
 
 namespace {
 
-const std::unordered_set<std::string>& kShortForms = { "s", "h", "ort", "forms" };
-const std::unordered_set<std::string>& kLongForms = { "long", "forms" };
+const std::set<std::string>& kShortForms = { "s", "h", "ort", "forms" };
+const std::set<std::string>& kLongForms = { "long", "forms" };
 const std::string kDescription = "description";
 const std::string kDefaultValue = "default value";
 
