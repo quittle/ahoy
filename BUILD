@@ -16,6 +16,7 @@ cc_library(
     ],
     hdrs = [
         "include/ahoy/arg.h",
+        "include/ahoy/newline.h",
         "include/ahoy/param.h",
         "include/ahoy/parse_result.h",
         "include/ahoy/parser.h",

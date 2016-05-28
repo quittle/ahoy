@@ -5,14 +5,13 @@
 #include <cstring>
 #include <map>
 #include <set>
+#include <sstream>
 #include <vector>
 
 #include "ahoy/arg.h"
+#include "ahoy/newline.h"
 #include "ahoy/param.h"
 #include "ahoy/parse_result.h"
-
-// TODO: Remove
-#include <iostream>
 
 namespace ahoy {
 
@@ -20,6 +19,63 @@ template<typename T>
 class Parser {
   public:
     explicit Parser<T>(const std::map<T, Arg>& args) : args_(args) {}
+
+    // Generates a help message for the args assigned to the parser
+    // newline - Determines the type of line ending to use to between lines of the message
+    std::string HelpMessage(Newline newline = Newline::AUTO) const {
+        if (newline == Newline::AUTO) {
+#if defined(WIN_32)
+            newline = Newline::POSIX;
+#else
+            newline = Newline::WINDOWS;
+#endif
+        }
+        const std::string line_ending = newline == Newline::WINDOWS ? "\r\n" : "\n";
+
+        std::stringstream ss;
+        for (const auto& entry : args_) {
+            const Arg arg = entry.second;
+            bool first = true;
+
+            // Add short forms
+            for (const std::string& form : arg.short_forms()) {
+                if (first) {
+                    first = false;
+                } else {
+                    ss << " ";
+                }
+
+                ss << "-" << form;
+            }
+
+            // Add long forms
+            for (const std::string& form : arg.long_forms()) {
+                if (first) {
+                    first = false;
+                } else {
+                    ss << " ";
+                }
+
+                ss << "--" << form;
+            }
+
+            // Add required / default value
+            ss << " (";
+            if (arg.required()) {
+                ss  << "Required";
+            } else {
+                ss << "Defaults to " << arg.default_value();
+            }
+            ss << ")";
+
+            // Add description
+            ss << " - " << arg.description();
+
+            // Add line ending
+            ss << line_ending;
+        }
+        return ss.str();
+    }
 
     // Parses the args from a standard main function.
     // Note: Duplicate fields will use first found field
@@ -67,7 +123,6 @@ class Parser {
                 std::string key, value;
                 char const * const equalsLoc = strstr(dehyphenated_arg, kEquals);
                 if (equalsLoc == NULL) {
-                    std::cout << "No equals found" << std::endl;
                     i++;
                     if (i >= argc) {
                         // Ran out of args to parse when looking for a value
@@ -82,8 +137,6 @@ class Parser {
                     key = std::string(dehyphenated_arg, equalsLoc - dehyphenated_arg);
                     value = std::string(equalsLoc + kEqualsLen);
                 }
-
-                std::cout << "Value: " << value << std::endl;
 
                 bool arg_was_expected = false;
                 for (const auto& entry : args_) {
@@ -125,17 +178,13 @@ class Parser {
             }
         }
 
-        for (const auto& entry : params) {
-            std::cout << entry.first << " " << entry.second.AsString() << std::endl;
-        }
-
         return ParseResult<T>(params, errors);
     }
 
   private:
     const std::map<T, Arg> args_;
 
-    std::string Join(std::set<std::string> set) const {
+    static std::string Join(std::set<std::string> set) {
         return std::accumulate(set.begin(), set.end(), std::string(),
                 [](const std::string& prev, const std::string& item) {
                     return std::string(prev.empty() ? "" : ", ") + item;

@@ -1,6 +1,7 @@
 #include "ahoy/parser.h"
 
 #include "ahoy/arg.h"
+#include "ahoy/newline.h"
 #include "ahoy/param.h"
 #include "ahoy/parse_result.h"
 
@@ -24,6 +25,32 @@ TEST(Parser, Template) {
     Parser<std::string>({{ "string", arg }});
 }
 
+TEST(Parser, Help_Windows) {
+    EXPECT_EQ(
+        "-f -foo --foo (Defaults to bar) - Help message 1\r\n"
+        "-w (Required) - Help message 2\r\n"
+        "--long-arg --long-arg-alt (Defaults to true) - Help message 3\r\n",
+        Parser<int>({
+            { 0, {{"f", "foo"}, {"foo"}, false, "Help message 1", "bar" }},
+            { 1, {{"w"}, {}, true, "Help message 2", "Should not be used" }},
+            { 2, {{}, {"long-arg", "long-arg-alt"}, false, "Help message 3", "true" }}
+        }).HelpMessage(Newline::WINDOWS)
+    );
+}
+
+TEST(Parser, Help_Posix) {
+    EXPECT_EQ(
+        "-f -foo --foo (Defaults to bar) - Help message 1\n"
+        "-w (Required) - Help message 2\n"
+        "--long-arg --long-arg-alt (Defaults to true) - Help message 3\n",
+        Parser<int>({
+            { 0, {{"f", "foo"}, {"foo"}, false, "Help message 1", "bar" }},
+            { 1, {{"w"}, {}, true, "Help message 2", "Should not be used" }},
+            { 2, {{}, {"long-arg", "long-arg-alt"}, false, "Help message 3", "true" }}
+        }).HelpMessage(Newline::POSIX)
+    );
+}
+
 TEST(Parser, MissingExecutable) {
     char const * const * const args = nullptr;
     const ParseResult<int> result = Parser<int>({}).Parse(0, args);
@@ -32,7 +59,7 @@ TEST(Parser, MissingExecutable) {
     EXPECT_EQ(1, result.errors().size());
 }
 
-TEST(Parser, Empty) {
+TEST(Parser, Parse_Empty) {
     char const * args[1] = { "" };
     const ParseResult<int> result_empty = Parser<int>({}).Parse(1, args);
     EXPECT_TRUE(result_empty);
@@ -46,7 +73,7 @@ TEST(Parser, Empty) {
     EXPECT_EQ(0, result_executable.errors().size());
 }
 
-TEST(Parser, Simple_ValidShort_Equals) {
+TEST(Parser, Parse_Simple_ValidShort_Equals) {
     char const * const args[2] = { kExecutable, "-f=bar" };
     const ParseResult<int> result =
             Parser<int>({{ 0, {{"f"}, {}, false, kDescription, kDefaultValue }}}).Parse(2, args);
@@ -56,7 +83,7 @@ TEST(Parser, Simple_ValidShort_Equals) {
     EXPECT_TRUE(result.errors().empty());
 }
 
-TEST(Parser, Simple_ValidShort_Space) {
+TEST(Parser, Parse_Simple_ValidShort_Space) {
     char const * const args[3] = { kExecutable, "-f", "bar" };
     const ParseResult<int> result =
             Parser<int>({{ 0, {{"f"}, {}, false, kDescription, kDefaultValue }}}).Parse(3, args);
@@ -86,7 +113,7 @@ TEST(Parser, Simple_ValidLong_Space) {
     EXPECT_EQ(0, result.errors().size());
 }
 
-TEST(Parser, Simple_Invalid) {
+TEST(Parser, Parse_Simple_Invalid) {
     char const * const args[2] = { kExecutable, "-f" };
     const std::map<int, Param> expected_defaulted_params = {{ 0, kDefaultValue }};
     const ParseResult<int> both_empty_result =
@@ -108,7 +135,7 @@ TEST(Parser, Simple_Invalid) {
     EXPECT_EQ(1, long_result.errors().size());
 }
 
-TEST(Parser, Required) {
+TEST(Parser, Parse_Required) {
     char const * const args[3] = { kExecutable, "-rf", "value" };
     const ParseResult<int> result =
             Parser<int>({{ 0, {{"rf"}, {"requiredField"}, true, kDescription, kDefaultValue }}})
@@ -129,7 +156,7 @@ TEST(Parser, Required_Missing) {
     EXPECT_EQ(1, result.errors().size());
 }
 
-TEST(Parser, DefaultValue) {
+TEST(Parser, Parse_DefaultValue) {
     char const * const args[1] = { kExecutable };
     const ParseResult<int> result =
             Parser<int>({{ 0, {{"mf"}, {"missingFiled"}, false, kDescription, kDefaultValue }}})
@@ -140,7 +167,7 @@ TEST(Parser, DefaultValue) {
     EXPECT_EQ(0, result.errors().size());
 }
 
-TEST(Parser, Duplicates) {
+TEST(Parser, Parse_Duplicates) {
     char const * const args[4] = { kExecutable, "-f", "value", "--field=value_2" };
     const ParseResult<int> result =
             Parser<int>({{ 0, {{"f"}, {"field"}, true, kDescription, kDefaultValue }}})
@@ -151,7 +178,7 @@ TEST(Parser, Duplicates) {
     EXPECT_EQ(1, result.errors().size());
 }
 
-TEST(Parser, Multiple) {
+TEST(Parser, Parse_Multiple) {
     char const * const args[6] =
             { kExecutable, "-f=foo", "--bar", "baz boop", "-hey", "hello=world" };
     const ParseResult<int> result = Parser<int>({
@@ -169,12 +196,6 @@ TEST(Parser, Multiple) {
     EXPECT_TRUE(result);
     EXPECT_EQ(expected_params, result.params());
     EXPECT_EQ(0, result.errors().size());
-    for (auto error : result.errors()) {
-        std::cout << error << std::endl;
-    }
-
 }
-
-TEST(Parser, Help) {}
 
 } // namespace ahoy
