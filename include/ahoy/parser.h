@@ -56,12 +56,12 @@ class Parser {
         std::stringstream ss;
         for (const auto& entry : args_) {
             const Arg arg = entry.second;
-            bool first = true;
+            bool first_form = true;
 
             // Add short forms
             for (const std::string& form : arg.short_forms()) {
-                if (first) {
-                    first = false;
+                if (first_form) {
+                    first_form = false;
                 } else {
                     ss << " ";
                 }
@@ -71,8 +71,8 @@ class Parser {
 
             // Add long forms
             for (const std::string& form : arg.long_forms()) {
-                if (first) {
-                    first = false;
+                if (first_form) {
+                    first_form = false;
                 } else {
                     ss << " ";
                 }
@@ -80,7 +80,7 @@ class Parser {
                 ss << "--" << form;
             }
 
-            // Add required / default value
+            // Add flag / required / default value
             ss << " (";
             if (arg.IsFlag()) {
                 ss << "Flag";
@@ -149,7 +149,7 @@ class Parser {
                 if (equalsLoc == NULL) {
                     key = std::string(dehyphenated_arg);
                     T args_key;
-                    if (Find(key, arg_size, args_key) && args_.at(args_key).IsFlag()) {
+                    if (FindArg(key, arg_size, args_key) && args_.at(args_key).IsFlag()) {
                         if (params.find(args_key) == params.end()) {
                             params.insert({args_key, true});
                         } else {
@@ -172,24 +172,15 @@ class Parser {
                     value = std::string(equalsLoc + kEqualsLen);
                 }
 
-                bool arg_was_expected = false;
-                for (const auto& entry : args_) {
-                    const T& type_key = entry.first;
-                    const Arg& arg = entry.second;
-                    if ((arg_size == kArgSizeShort && arg.HasShortForm(key)) ||
-                            (arg_size == kArgSizeLong && arg.HasLongForm(key))) {
-                        if (params.find(type_key) == params.end()) {
-                            params.insert({type_key, value});
-                        } else {
-                            errors.emplace_back(std::string() + "Duplicate of arg found. Name: " +
-                                    key);
-                        }
-                        arg_was_expected = true;
-                        break;
+                T type_key;
+                if (FindArg(key, arg_size, type_key)) {
+                    if (params.find(type_key) == params.end()) {
+                        params.insert({type_key, value});
+                    } else {
+                        errors.emplace_back(std::string() + "Duplicate of arg found. Name: " +
+                                key);
                     }
-                }
-
-                if (!arg_was_expected) {
+                } else {
                     errors.emplace_back(std::string() +
                             "Arg was unexpected because it has an unexpected name or was expected "
                             "to be - or -- but was other. Name: \"" + key +
@@ -201,13 +192,13 @@ class Parser {
 
         for (const auto& entry : args_) {
             if (params.find(entry.first) == params.end()) {
-                if (entry.second.required()) {
+                if (entry.second.IsFlag()) {
+                    params.insert({entry.first, false});
+                } else if (entry.second.required()) {
                     errors.emplace_back(std::string() + "Missing required field: [" +
                             Join(entry.second.short_forms()) + "] [" +
                             Join(entry.second.long_forms()) + "]");
                     continue;
-                } else if (entry.second.IsFlag()) {
-                    params.insert({entry.first, false});
                 } else {
                     params.insert({entry.first, *entry.second.default_value()});
                 }
@@ -239,7 +230,7 @@ class Parser {
     // Finds the first arg that matches |form| and |arg_size|
     // Returns true if found and false if not. If true is returned, then ret will be updated with
     // the key for the arg.
-    bool Find(const std::string& form, const char arg_size, T& ret) const {
+    bool FindArg(const std::string& form, const char arg_size, T& ret) const {
         for (const auto& entry : args_) {
             const T& key = entry.first;
             const Arg& arg = entry.second;
