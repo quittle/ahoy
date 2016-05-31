@@ -32,6 +32,7 @@ Param::Param() : Param("") {}
 Param::Param(char const * const value) : Param(std::string(value)) {}
 
 Param::Param(const std::string& value) : value_(value) {}
+Param::Param(const bool value) : value_(value ? "true" : "false") {}
 
 std::string Param::AsString() const {
     return value_;

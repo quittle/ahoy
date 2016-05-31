@@ -14,8 +14,6 @@ class ParseResult {
     explicit ParseResult(const std::map<T, Param>& params, const std::vector<std::string>& errors) :
             params_(params), errors_(errors), succcessful_(errors.empty()) {}
 
-    //ParseResult<T>& operator=(ParseResult<T>&&) = default;
-
     const std::map<T, Param>& params() const {
         return params_;
     }

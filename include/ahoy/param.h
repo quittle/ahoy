@@ -10,7 +10,7 @@ class Param {
     Param();
     Param(const std::string& value);
     Param(char const * const value);
-    //Param(const Param&) = default;
+    Param(const bool value);
 
     std::string AsString() const;
     int AsInt() const;

@@ -61,10 +61,12 @@ class Parser {
 
             // Add required / default value
             ss << " (";
-            if (arg.required()) {
+            if (arg.IsFlag()) {
+                ss << "Flag";
+            } else if (arg.required()) {
                 ss  << "Required";
             } else {
-                ss << "Defaults to " << arg.default_value();
+                ss << "Defaults to " << *arg.default_value();
             }
             ss << ")";
 
@@ -84,10 +86,6 @@ class Parser {
         const size_t kEqualsLen = strlen(kEquals);
         const char kHyphen = '-';
 
-        const char kArgSizeInit = -1;
-        const char kArgSizeShort = 0;
-        const char kArgSizeLong = 1;
-
         std::map<T, Param> params;
         std::vector<std::string> errors;
 
@@ -105,7 +103,7 @@ class Parser {
                 continue;
             } else { // - or -- argument
                 const char* dehyphenated_arg = nullptr;
-                char arg_size = kArgSizeInit;
+                char arg_size = kArgSizeInvalid;
 
                 // Account for hyphens
                 if (arg[1] != kHyphen) { // Short argument
@@ -123,6 +121,17 @@ class Parser {
                 std::string key, value;
                 char const * const equalsLoc = strstr(dehyphenated_arg, kEquals);
                 if (equalsLoc == NULL) {
+                    key = std::string(dehyphenated_arg);
+                    T args_key;
+                    if (Find(key, arg_size, args_key) && args_.at(args_key).IsFlag()) {
+                        if (params.find(args_key) == params.end()) {
+                            params.insert({args_key, true});
+                        } else {
+                            errors.emplace_back(std::string() + "Duplicate of arg found. Name: " +
+                                    key);
+                        }
+                        continue;
+                    }
                     i++;
                     if (i >= argc) {
                         // Ran out of args to parse when looking for a value
@@ -131,7 +140,6 @@ class Parser {
                                 arg);
                         continue;
                     }
-                    key = std::string(dehyphenated_arg);
                     value = argv[i];
                 } else {
                     key = std::string(dehyphenated_arg, equalsLoc - dehyphenated_arg);
@@ -172,8 +180,10 @@ class Parser {
                             Join(entry.second.short_forms()) + "] [" +
                             Join(entry.second.long_forms()) + "]");
                     continue;
+                } else if (entry.second.IsFlag()) {
+                    params.insert({entry.first, false});
                 } else {
-                    params.insert({entry.first, entry.second.default_value()});
+                    params.insert({entry.first, *entry.second.default_value()});
                 }
             }
         }
@@ -182,7 +192,27 @@ class Parser {
     }
 
   private:
+    static const char kArgSizeInvalid = -1;
+    static const char kArgSizeShort = 0;
+    static const char kArgSizeLong = 1;
+
     const std::map<T, Arg> args_;
+
+    // Finds the first arg that matches |form| and |arg_size|
+    // Returns true if found and false if not. If true is returned, then ret will be updated with
+    // the key for the arg.
+    bool Find(const std::string& form, const char arg_size, T& ret) const {
+        for (const auto& entry : args_) {
+            const T& key = entry.first;
+            const Arg& arg = entry.second;
+            if ((arg_size == kArgSizeShort && arg.HasShortForm(form)) ||
+                        (arg_size == kArgSizeLong && arg.HasLongForm(form))) {
+                    ret = key;
+                    return true;
+            }
+        }
+        return false;
+    }
 
     static std::string Join(std::set<std::string> set) {
         return std::accumulate(set.begin(), set.end(), std::string(),
