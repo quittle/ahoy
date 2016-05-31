@@ -11,6 +11,7 @@ cc_library(
     name = "ahoy_internal",
     srcs = [
         "src/arg.cc",
+        "src/newline.cc",
         "src/param.cc",
         "include/ahoy/parser.h",
     ],
@@ -28,6 +29,7 @@ cc_test(
     name = "unit_tests",
     srcs = [
         "tst/arg_ut.cc",
+        "tst/newline_ut.cc",
         "tst/param_ut.cc",
         "tst/parse_result_ut.cc",
         "tst/parser_ut.cc",

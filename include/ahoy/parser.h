@@ -51,14 +51,7 @@ class Parser {
     // Generates a help message for the args assigned to the parser
     // newline - Determines the type of line ending to use to between lines of the message
     std::string HelpMessage(Newline newline = Newline::AUTO) const {
-        if (newline == Newline::AUTO) {
-#if defined(WIN_32)
-            newline = Newline::POSIX;
-#else
-            newline = Newline::WINDOWS;
-#endif
-        }
-        const std::string line_ending = newline == Newline::WINDOWS ? "\r\n" : "\n";
+        const std::string line_ending = NewlineToString(newline);
 
         std::stringstream ss;
         for (const auto& entry : args_) {
@@ -224,7 +217,9 @@ class Parser {
         return ParseResult<T>(params, errors);
     }
 
-
+    // Returns the validity of the Parser. If false, the parser was initialized incorrectly and
+    // should not be used in production code. This value should most likely be deterministic at
+    // runtime.
     operator bool() const {
         return valid_;
     }
