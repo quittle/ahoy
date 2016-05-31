@@ -18,7 +18,6 @@ class Param {
     bool AsBool() const;
 
     Param& operator=(const Param&) = default;
-    //Param& operator=(Param&&) = default;
     bool operator==(const Param& rhs) const;
     bool operator!=(const Param& rhs) const;
 

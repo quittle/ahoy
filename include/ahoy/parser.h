@@ -18,7 +18,35 @@ namespace ahoy {
 template<typename T>
 class Parser {
   public:
-    explicit Parser<T>(const std::map<T, Arg>& args) : args_(args) {}
+    // Builds a parser with the given |args|. If the args are invalid, the Parser will be falsey and
+    // should be tested like so:
+    // Parser parser = Parser<int>::Create({...});
+    // if (!parser) {
+    //   // Print error message and quit.
+    // }
+    // Note: If this parser is invalid, then it is almost definitely a programming error, not a user
+    // error so this should value should be deterministic at runtime.
+    static Parser<T> Create(const std::map<T, Arg>& args) {
+        std::set<std::string> short_forms;
+        std::set<std::string> long_forms;
+        for (const auto& arg : args) {
+            const std::set<std::string> args_short_forms = arg.second.short_forms();
+            for (const std::string& form : args_short_forms) {
+                if (short_forms.find(form) != short_forms.end()) {
+                    return Parser<T>(args, false);
+                }
+                short_forms.insert(form);
+            }
+            const std::set<std::string> args_long_forms = arg.second.long_forms();
+            for (const std::string& form : args_long_forms) {
+                if (long_forms.find(form) != long_forms.end()) {
+                    return Parser<T>(args, false);
+                }
+                long_forms.insert(form);
+            }
+        }
+        return Parser<T>(args, true);
+    }
 
     // Generates a help message for the args assigned to the parser
     // newline - Determines the type of line ending to use to between lines of the message
@@ -88,6 +116,11 @@ class Parser {
 
         std::map<T, Param> params;
         std::vector<std::string> errors;
+
+        if (!valid_) {
+            errors.emplace_back("Use of an invalid parser. Program failed to build a valid "
+                                "parser.");
+        }
 
         if (argc < 1) {
             errors.emplace_back(std::string() +
@@ -191,12 +224,22 @@ class Parser {
         return ParseResult<T>(params, errors);
     }
 
+
+    operator bool() const {
+        return valid_;
+    }
+
   private:
     static const char kArgSizeInvalid = -1;
     static const char kArgSizeShort = 0;
     static const char kArgSizeLong = 1;
 
     const std::map<T, Arg> args_;
+    const bool valid_;
+
+
+    explicit Parser<T>(const std::map<T, Arg>& args, const bool valid) :
+            args_(args), valid_(valid) {}
 
     // Finds the first arg that matches |form| and |arg_size|
     // Returns true if found and false if not. If true is returned, then ret will be updated with
