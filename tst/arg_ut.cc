@@ -8,8 +8,8 @@ namespace {
 
 const std::set<std::string>& kShortForms = { "s", "h", "ort", "forms" };
 const std::set<std::string>& kLongForms = { "long", "forms" };
-const std::string kDescription = "description";
-const std::string kDefaultValue = "default value";
+const char kDescription[] = "description";
+const char kDefaultValue[] = "default value";
 
 } // namespace
 
@@ -19,7 +19,7 @@ class ArgTest : public ::testing::Test {
   public:
     ArgTest() :
         flag_arg_(Arg(kShortForms, kLongForms, kDescription)),
-        string_arg_(Arg(kShortForms, kLongForms, kDescription, true, kDefaultValue)) {}
+        string_arg_(Arg(kShortForms, kLongForms, kDescription, false, kDefaultValue)) {}
 
   protected:
     const Arg flag_arg_;
@@ -68,6 +68,9 @@ TEST_F(ArgTest, Description) {
 TEST_F(ArgTest, DefaultValue) {
     EXPECT_EQ(nullptr, flag_arg_.default_value());
     EXPECT_EQ(kDefaultValue, *string_arg_.default_value());
+    // Required args have no valid default value
+    EXPECT_EQ(nullptr,
+              Arg(kShortForms, kLongForms, kDescription, true, kDefaultValue).default_value());
 }
 
 } // namespace ahoy

@@ -54,7 +54,7 @@ bool Arg::required() const {
 }
 
 const std::string* Arg::default_value() const {
-    if (is_flag_) {
+    if (is_flag_ || required_) {
         return nullptr;
     } else {
         return &default_value_;

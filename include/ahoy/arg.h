@@ -38,7 +38,7 @@ class Arg {
     const std::string description_;
     const bool required_;
     const std::string default_value_;
-    // This should be true if the Arg is a boolean flag or false if it should hold a string
+    // This should be true if the Arg is a boolean flag
     const bool is_flag_;
 };
 
