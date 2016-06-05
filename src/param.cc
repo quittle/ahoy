@@ -67,3 +67,8 @@ bool Param::operator!=(const Param& rhs) const {
 }
 
 } // namespace ahoy
+
+std::ostream& operator<<(std::ostream& os, const ahoy::Param& param) {
+    os << param.AsString();
+    return os;
+}

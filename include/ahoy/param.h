@@ -1,6 +1,7 @@
 #ifndef AHOY_AHOY_PARAM_H
 #define AHOY_AHOY_PARAM_H
 
+#include <iostream>
 #include <string>
 
 namespace ahoy {
@@ -26,5 +27,7 @@ class Param {
 };
 
 } // namespace ahoy
+
+std::ostream& operator<<(std::ostream& os, const ahoy::Param& param);
 
 #endif // AHOY_AHOY_PARAM_H
