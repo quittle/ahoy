@@ -48,4 +48,5 @@ cc_test(
 cc_binary(
     name = "sample",
     srcs = [ "tst/sample_main.cc" ],
+    deps = [ ":ahoy" ],
 )
