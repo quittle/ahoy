@@ -11,6 +11,7 @@ namespace {
 
 const char kExecutable[] = "./executable";
 const char kDescription[] = "description";
+const char kName[] = "name";
 const char kDefaultValue[] = "default value";
 
 } // namespace
@@ -19,18 +20,18 @@ namespace ahoy {
 
 TEST(Parser, Create_Valid) {
     Parser<int> p = Parser<int>::Create({
-        { 0, { {}, {}, kDescription, false, kDefaultValue} },
-        { 1, { {"f"}, {"flag"}, kDescription, true, kDefaultValue} },
-        { 2, { {"flag"}, {"flagflag"}, kDescription, true, kDefaultValue} }
+        { 0, { {}, {}, kDescription, kDefaultValue} },
+        { 1, { {"f"}, {"flag"}, kDescription} },
+        { 2, { {"flag"}, {"flagflag"}, kDescription, false} }
     });
     EXPECT_TRUE(p);
 }
 
 TEST(Parser, Create_Invalid_DuplicateSwitches) {
     Parser<int> p = Parser<int>::Create({
-        { 0, { {}, {}, kDescription, false, kDefaultValue} },
-        { 1, { {"f"}, {"flag"}, kDescription, true, kDefaultValue} },
-        { 2, { {"f"}, {"flag"}, kDescription, true, kDefaultValue} }
+        { 0, { {}, {}, kDescription, kDefaultValue } },
+        { 1, { {"f"}, {"flag"}, kDescription } },
+        { 2, { {"f"}, {"flag"}, kDescription } }
     });
     EXPECT_FALSE(p);
 }
@@ -38,8 +39,8 @@ TEST(Parser, Create_Invalid_DuplicateSwitches) {
 TEST(Parser, Create_Invalid_DuplicateIds) {
     Parser<int> p = Parser<int>::Create(
         {
-            { 0, { {}, {}, kDescription, false, kDefaultValue} },
-            { 1, { {"f"}, {"flag"}, kDescription, true, kDefaultValue} },
+            { 0, { {}, {}, kDescription, kDefaultValue } },
+            { 1, { {"f"}, {"flag"}, kDescription } },
         }, {
             { 2, { "Misorder is fine", kDescription } },
             { 1, { "Whoops", kDescription } },
@@ -48,7 +49,7 @@ TEST(Parser, Create_Invalid_DuplicateIds) {
 }
 
 TEST(Parser, Template) {
-    const Arg arg = { {}, {}, kDescription, false, kDefaultValue};
+    const Arg arg = { {}, {}, kDescription, kDefaultValue };
     Parser<char>::Create({ { 'c', arg } });
     Parser<int>::Create({ { 0, arg } });
     Parser<long>::Create({ { 0l, arg } });
@@ -64,10 +65,10 @@ TEST(Parser, Help_Windows) {
         "filename - The file to act on\r\n",
         Parser<int>::Create(
             {
-                { 0, { {"f", "foo"}, {"foo"}, "Help message 1", false, "bar" } },
-                { 1, { {"w"}, {}, "Help message 2", true, "Should not be used" } },
-                { 2, { {}, {"long-arg", "long-arg-alt"}, "Help message 3", false, "true" } },
-                { 3, { {}, {"flag"}, "Enables the flag" } }
+                { 0, { {"f", "foo"}, {"foo"}, "Help message 1", "bar" } },
+                { 1, { {"w"}, {}, "Help message 2" } },
+                { 2, { {}, {"long-arg", "long-arg-alt"}, "Help message 3", "true" } },
+                { 3, { {}, {"flag"}, "Enables the flag", true } }
             }, {
                 { 4, { "filename", "The file to act on" } }
             }
@@ -84,10 +85,10 @@ TEST(Parser, Help_Posix) {
         "filename - The file to act on\n",
         Parser<int>::Create(
             {
-                { 0, { {"f", "foo"}, {"foo"}, "Help message 1", false, "bar" } },
-                { 1, { {"w"}, {}, "Help message 2", true, "Should not be used" } },
-                { 2, { {}, {"long-arg", "long-arg-alt"}, "Help message 3", false, "true" } },
-                { 3, { {}, {"flag"}, "Enables the flag" } },
+                { 0, { {"f", "foo"}, {"foo"}, "Help message 1", "bar" } },
+                { 1, { {"w"}, {}, "Help message 2" } },
+                { 2, { {}, {"long-arg", "long-arg-alt"}, "Help message 3", "true" } },
+                { 3, { {}, {"flag"}, "Enables the flag", true } }
             }, {
                 { 4, { "filename", "The file to act on" } }
             }
@@ -98,8 +99,8 @@ TEST(Parser, Help_Posix) {
 TEST(Parser, InvalidParser) {
     char const * const args[2] = { kExecutable, "-f=bar" };
     const Parser<int> parser = Parser<int>::Create({
-                { 0, { {"f"}, {}, kDescription, false, kDefaultValue } },
-                { 1, { {"f"}, {}, kDescription, false, kDefaultValue } },  // Duplicate short switch
+                { 0, { {"f"}, {}, kDescription, kDefaultValue } },
+                { 1, { {"f"}, {}, kDescription, kDefaultValue } },  // Duplicate short switch
             });
     EXPECT_FALSE(parser);
     const ParseResult<int> result = parser.Parse(2, args);
@@ -136,7 +137,7 @@ TEST(Parser, Parse_Simple_NamedArg) {
     const ParseResult<int> result = Parser<int>::Create(
         {},
         {
-            { 0, { "file", kDescription } }
+            { 0, { kName, kDescription } }
         }).Parse(2, args);
     EXPECT_TRUE(result);
     const std::map<int, Param> expected_params = { { 0, "/path/to/file" } };
@@ -155,11 +156,11 @@ TEST(Parser, Parse_Simple_NamedArg_Invalid_UnexpectedArg_ExpectNone) {
 }
 
 TEST(Parser, Parse_Simple_NamedArg_Invalid_UnexpectedArg_ExpectOne) {
-    char const * const args[3] = { kExecutable, "/path/to/file", "rando arg" };
+    char const * const args[3] = { kExecutable, "/path/to/file", "random arg" };
     const ParseResult<int> result = Parser<int>::Create(
         {},
         {
-            { 0, { "file", kDescription } }
+            { 0, { kName, kDescription } }
         }).Parse(3, args);
     EXPECT_FALSE(result);
     const std::map<int, Param> expected_params = { { 0, "/path/to/file" } };
@@ -172,7 +173,7 @@ TEST(Parser, Parse_Simple_NamedArg_Invalid_MissingArg) {
     const ParseResult<int> result = Parser<int>::Create(
         {},
         {
-            { 0, { "file", kDescription } }
+            { 0, { kName, kDescription } }
         }).Parse(1, args);
     EXPECT_FALSE(result);
     EXPECT_EQ(0, result.params().size());
@@ -182,7 +183,7 @@ TEST(Parser, Parse_Simple_NamedArg_Invalid_MissingArg) {
 TEST(Parser, Parse_Simple_ValidShort_Equals) {
     char const * const args[2] = { kExecutable, "-f=bar" };
     const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"f"}, {}, kDescription, false, kDefaultValue } }
+                { 0, { {"f"}, {}, kDescription, kDefaultValue } }
             }).Parse(2, args);
     EXPECT_TRUE(result);
     const std::map<int, Param> expected_params = { { 0, "bar" } };
@@ -193,7 +194,7 @@ TEST(Parser, Parse_Simple_ValidShort_Equals) {
 TEST(Parser, Parse_Simple_ValidShort_Space) {
     char const * const args[3] = { kExecutable, "-f", "bar" };
     const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"f"}, {}, kDescription, false, kDefaultValue } }
+                { 0, { {"f"}, {}, kDescription, kDefaultValue } }
             }).Parse(3, args);
     EXPECT_TRUE(result);
     const std::map<int, Param> expected_params = { { 0, "bar" } };
@@ -204,7 +205,7 @@ TEST(Parser, Parse_Simple_ValidShort_Space) {
 TEST(Parser, Simple_ValidLong_Equals) {
     char const * const args[2] = { kExecutable, "--foo=bar" };
     const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {}, {"foo"}, kDescription, false, kDefaultValue } }
+                { 0, { {}, {"foo"}, kDescription, kDefaultValue } }
             }).Parse(2, args);
     EXPECT_TRUE(result);
     const std::map<int, Param> expected_params = { { 0, "bar" } };
@@ -215,7 +216,7 @@ TEST(Parser, Simple_ValidLong_Equals) {
 TEST(Parser, Simple_ValidLong_Space) {
     char const * const args[3] = { kExecutable, "--foo", "bar" };
     const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {}, {"foo"}, kDescription, false, kDefaultValue } }
+                { 0, { {}, {"foo"}, kDescription, kDefaultValue } }
             }).Parse(3, args);
     EXPECT_TRUE(result);
     const std::map<int, Param> expected_params = { { 0, "bar" } };
@@ -227,21 +228,21 @@ TEST(Parser, Parse_Simple_Invalid) {
     char const * const args[2] = { kExecutable, "-f" };
     const std::map<int, Param> expected_defaulted_params = { { 0, kDefaultValue } };
     const ParseResult<int> both_empty_result = Parser<int>::Create({
-                { 0, { {}, {}, kDescription, false, kDefaultValue } }
+                { 0, { {}, {}, kDescription, kDefaultValue } }
             }).Parse(2, args);
     EXPECT_FALSE(both_empty_result);
     EXPECT_EQ(expected_defaulted_params, both_empty_result.params());
     EXPECT_EQ(1, both_empty_result.errors().size());
 
     const ParseResult<int> short_result = Parser<int>::Create({
-                { 0, { {"f"}, {}, kDescription, false, kDefaultValue } }
+                { 0, { {"f"}, {}, kDescription, kDefaultValue } }
             }).Parse(2, args);
     EXPECT_FALSE(short_result);
     EXPECT_EQ(expected_defaulted_params, short_result.params());
     EXPECT_EQ(1, short_result.errors().size());
 
     const ParseResult<int> long_result = Parser<int>::Create({
-                { 0, { {}, {"f"}, kDescription, false, kDefaultValue } }
+                { 0, { {}, {"f"}, kDescription, kDefaultValue } }
             }).Parse(2, args);
     EXPECT_FALSE(long_result);
     EXPECT_EQ(expected_defaulted_params, long_result.params());
@@ -251,7 +252,7 @@ TEST(Parser, Parse_Simple_Invalid) {
 TEST(Parser, Parse_Required) {
     char const * const args[3] = { kExecutable, "-rf", "value" };
     const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"rf"}, {"requiredField"}, kDescription, true, kDefaultValue } }
+                { 0, { {"rf"}, {"requiredField"}, kDescription } }
             }).Parse(3, args);
     EXPECT_TRUE(result);
     const std::map<int, Param> expected_params = { { 0, "value" } };
@@ -262,7 +263,7 @@ TEST(Parser, Parse_Required) {
 TEST(Parser, Required_Missing) {
     char const * const args[1] = { kExecutable };
     const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"requiredField"}, {}, kDescription, true, kDefaultValue } }
+                { 0, { {"requiredField"}, {}, kDescription } }
             }).Parse(1, args);
     EXPECT_FALSE(result);
     EXPECT_EQ(0, result.params().size());
@@ -272,7 +273,7 @@ TEST(Parser, Required_Missing) {
 TEST(Parser, Parse_DefaultValue) {
     char const * const args[1] = { kExecutable };
     const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"mf"}, {"missingFiled"}, kDescription, false, kDefaultValue } }
+                { 0, { {"mf"}, {"missingFiled"}, kDescription, kDefaultValue } }
             }).Parse(1, args);
     const std::map<int, Param> expected_params = { { 0, kDefaultValue } };
     EXPECT_TRUE(result);
@@ -283,7 +284,7 @@ TEST(Parser, Parse_DefaultValue) {
 TEST(Parser, Parse_Flag_Missing) {
     char const * const args[1] = { kExecutable };
     const ParseResult<int> result =
-            Parser<int>::Create({ { 0, { {"f"}, {"flag"}, kDescription } } })
+            Parser<int>::Create({ { 0, { {"f"}, {"flag"}, kDescription, true } } })
                     .Parse(1, args);
     const std::map<int, Param> expected_params = { { 0, false } };
     EXPECT_TRUE(result);
@@ -294,10 +295,34 @@ TEST(Parser, Parse_Flag_Missing) {
 TEST(Parser, Parse_Flag) {
     char const * const args[2] = { kExecutable, "--flag" };
     const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"f"}, {"flag"}, kDescription } }
+                { 0, { {"f"}, {"flag"}, kDescription, true } }
             }).Parse(2, args);
     const std::map<int, Param> expected_params = { { 0, true } };
     EXPECT_TRUE(result);
+    EXPECT_EQ(expected_params, result.params());
+    EXPECT_EQ(0, result.errors().size());
+}
+
+TEST(Parser, Parse_MixedSwitchesAndNamedArgs) {
+    char const * const args[7] =
+            { kExecutable, "-flag", "arg 1", "--count", "1", "arg 2", "-f=bar" };
+    const ParseResult<int> result = Parser<int>::Create(
+            {
+                { 0, { {}, {"count"}, kDescription } },
+                { 1, { {"flag"}, {}, kDescription, true } },
+                { 2, { {"f"}, {"foo"}, kDescription, "baz" } },
+            }, {
+                { 3, { kName, kDescription } },
+                { 4, { kName, kDescription } },
+            }).Parse(7, args);
+    EXPECT_TRUE(result);
+    const std::map<int, Param> expected_params = {
+        { 0, "1" },
+        { 1, true },
+        { 2, "bar"},
+        { 3, "arg 1" },
+        { 4, "arg 2" }
+    };
     EXPECT_EQ(expected_params, result.params());
     EXPECT_EQ(0, result.errors().size());
 }
@@ -306,8 +331,8 @@ TEST(Parser, Parse_Duplicates) {
     char const * const args[6] =
         { kExecutable, "-f", "value", "--field=value_2", "-flag", "--flag" };
     const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"f"}, {"field"}, kDescription, true, kDefaultValue } },
-                { 1, { {"flag"}, {"flag"}, kDescription} }
+                { 0, { {"f"}, {"field"}, kDescription } },
+                { 1, { {"flag"}, {"flag"}, kDescription, true } }
             }).Parse(6, args);
     EXPECT_FALSE(result);
     const std::map<int, Param> expected_params = { { 0, "value" }, { 1, true } };
@@ -316,26 +341,28 @@ TEST(Parser, Parse_Duplicates) {
 }
 
 TEST(Parser, Parse_Multiple) {
-    char const * const args[8] =
+    char const * const args[9] =
             { kExecutable,
-              "-f=foo", "--bar", "baz boop", "-hey", "hello=world",
+              "-f=foo", "--bar", "baz boop", "-enable-everything", "-hey", "hello=world",
               "/path/to/file.jpg", "100" };
     const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"f"}, {"long-f"}, kDescription, false, kDefaultValue } },
-                { 1, { {"b"}, {"bar"}, kDescription, true, kDefaultValue } },
-                { 2, { {"m"}, {"missing"}, kDescription, false, kDefaultValue } },
-                { 3, { {"hey"}, {"hey"}, kDescription, true, kDefaultValue } }
+                { 0, { {"f"}, {"long-f"}, kDescription, kDefaultValue } },
+                { 1, { {"b"}, {"bar"}, kDescription } },
+                { 2, { {"m"}, {"missing"}, kDescription, kDefaultValue } },
+                { 3, { {"hey"}, {"hey"}, kDescription } },
+                { 4, { {"enable-everything"}, {"enable-everything"}, kDescription, true } }
             }, {
-                { 4, { "file-path", kDescription} },
-                { 5, { "repetitions", kDescription} },
-            }).Parse(8, args);
+                { 5, { "file-path", kDescription } },
+                { 6, { "repetitions", kDescription } },
+            }).Parse(9, args);
     const std::map<int, Param> expected_params = {
         { 0, "foo" },
         { 1, "baz boop" },
         { 2, kDefaultValue },
         { 3, "hello=world" },
-        { 4, "/path/to/file.jpg" },
-        { 5, "100" }
+        { 4, true },
+        { 5, "/path/to/file.jpg" },
+        { 6, "100" }
     };
     EXPECT_TRUE(result);
     EXPECT_EQ(expected_params, result.params());

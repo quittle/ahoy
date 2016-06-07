@@ -6,22 +6,28 @@
 namespace ahoy {
 
 Arg::Arg(const std::set<std::string>& short_forms, const std::set<std::string>& long_forms,
-            const std::string& description, const bool required, const std::string& default_value) :
+         const std::string& description, const bool is_flag) :
         short_forms_(short_forms),
         long_forms_(long_forms),
         description_(description),
-        required_(required),
-        default_value_(default_value),
-        is_flag_(false) {}
+        required_(!is_flag),
+        default_value_(""),
+        is_flag_(is_flag) {}
+
+Arg::Arg(const std::set<std::string>& short_forms,
+         const std::set<std::string>& long_forms,
+         const std::string& description,
+         char const * const default_value) :
+        Arg(short_forms, long_forms, description, std::string(default_value)) {}
 
 Arg::Arg(const std::set<std::string>& short_forms, const std::set<std::string>& long_forms,
-            const std::string& description) :
+         const std::string& description, const std::string& default_value) :
         short_forms_(short_forms),
         long_forms_(long_forms),
         description_(description),
         required_(false),
-        default_value_(""),
-        is_flag_(true) {}
+        default_value_(default_value),
+        is_flag_(false) {}
 
 Arg::~Arg() {}
 
@@ -49,7 +55,7 @@ const std::string& Arg::description() const {
     return description_;
 }
 
-bool Arg::required() const {
+bool Arg::IsRequired() const {
     return required_;
 }
 

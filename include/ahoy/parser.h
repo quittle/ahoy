@@ -122,7 +122,7 @@ class Parser {
             ss << " (";
             if (arg.IsFlag()) {
                 ss << "Flag";
-            } else if (arg.required()) {
+            } else if (arg.IsRequired()) {
                 ss  << "Required";
             } else {
                 ss << "Defaults to " << *arg.default_value();
@@ -272,7 +272,7 @@ class Parser {
             if (params.find(entry.first) == params.end()) {
                 if (entry.second.IsFlag()) {
                     params.insert({entry.first, false});
-                } else if (entry.second.required()) {
+                } else if (entry.second.IsRequired()) {
                     errors.emplace_back(std::string() + "Missing required field: [" +
                             Join(entry.second.short_forms()) + "] [" +
                             Join(entry.second.long_forms()) + "]");

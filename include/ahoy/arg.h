@@ -8,13 +8,21 @@ namespace ahoy {
 
 class Arg {
   public:
-    Arg(const std::set<std::string>& short_forms,
-            const std::set<std::string>& long_forms,
-            const std::string& description);
+    // Arg or Required Switch
     Arg(const std::set<std::string>& short_forms,
             const std::set<std::string>& long_forms,
             const std::string& description,
-            const bool required,
+            const bool is_flag = false);
+    // Non-required Switch. If this just relied on the implicit constructor, then `char*` would
+    // implicitly have the boolean operator called instead of the std::string constructor
+    Arg(const std::set<std::string>& short_forms,
+            const std::set<std::string>& long_forms,
+            const std::string& description,
+            char const * const default_value);
+    // Non-required Switch
+    Arg(const std::set<std::string>& short_forms,
+            const std::set<std::string>& long_forms,
+            const std::string& description,
             const std::string& default_value);
     virtual ~Arg();
 
@@ -28,7 +36,7 @@ class Arg {
     const std::set<std::string>& short_forms() const;
     const std::set<std::string>& long_forms() const;
     const std::string& description() const;
-    bool required() const;
+    bool IsRequired() const;
     // Returns nullptr if the arg was a flag
     const std::string* default_value() const;
 
