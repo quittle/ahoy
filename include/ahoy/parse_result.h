@@ -4,17 +4,18 @@
 #include <map>
 #include <vector>
 
-#include "ahoy/param.h"
+#include "ahoy/actualized_parameter.h"
 
 namespace ahoy {
 
 template<typename T>
 class ParseResult {
   public:
-    explicit ParseResult(const std::map<T, Param>& params, const std::vector<std::string>& errors) :
+    explicit ParseResult(const std::map<T, ActualizedParameter>& params,
+                         const std::vector<std::string>& errors) :
             params_(params), errors_(errors), succcessful_(errors.empty()) {}
 
-    const std::map<T, Param>& params() const {
+    const std::map<T, ActualizedParameter>& params() const {
         return params_;
     }
 
@@ -27,7 +28,7 @@ class ParseResult {
     }
 
   private:
-    const std::map<T, Param> params_;
+    const std::map<T, ActualizedParameter> params_;
     const std::vector<std::string> errors_;
     const bool succcessful_;
 };

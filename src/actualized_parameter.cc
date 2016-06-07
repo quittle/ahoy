@@ -1,4 +1,4 @@
-#include "ahoy/param.h"
+#include "ahoy/actualized_parameter.h"
 
 #include <algorithm>
 #include <set>
@@ -26,27 +26,27 @@ const std::set<std::string> kBoolsFalse = {
 
 namespace ahoy {
 
+ActualizedParameter::ActualizedParameter() : ActualizedParameter("") {}
 
-Param::Param() : Param("") {}
+ActualizedParameter::ActualizedParameter(char const * const value) :
+        ActualizedParameter(std::string(value)) {}
 
-Param::Param(char const * const value) : Param(std::string(value)) {}
+ActualizedParameter::ActualizedParameter(const std::string& value) : value_(value) {}
+ActualizedParameter::ActualizedParameter(const bool value) : value_(value ? "true" : "false") {}
 
-Param::Param(const std::string& value) : value_(value) {}
-Param::Param(const bool value) : value_(value ? "true" : "false") {}
-
-std::string Param::AsString() const {
+std::string ActualizedParameter::AsString() const {
     return value_;
 }
 
-int Param::AsInt() const {
+int ActualizedParameter::AsInt() const {
     return stoi(value_);
 }
 
-long Param::AsLong() const {
+long ActualizedParameter::AsLong() const {
     return stol(value_);
 }
 
-bool Param::AsBool() const {
+bool ActualizedParameter::AsBool() const {
     std::string lower = value_;
     std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
     if (kBoolsTrue.find(lower) != kBoolsTrue.end()) {
@@ -58,17 +58,17 @@ bool Param::AsBool() const {
     }
 }
 
-bool Param::operator==(const Param& rhs) const {
+bool ActualizedParameter::operator==(const ActualizedParameter& rhs) const {
     return value_ == rhs.value_;
 }
 
-bool Param::operator!=(const Param& rhs) const {
+bool ActualizedParameter::operator!=(const ActualizedParameter& rhs) const {
     return !(*this == rhs);
 }
 
 } // namespace ahoy
 
-std::ostream& operator<<(std::ostream& os, const ahoy::Param& param) {
+std::ostream& operator<<(std::ostream& os, const ahoy::ActualizedParameter& param) {
     os << param.AsString();
     return os;
 }

@@ -10,17 +10,17 @@ cc_library(
 cc_library(
     name = "ahoy_internal",
     srcs = [
-        "src/arg.cc",
-        "src/named_arg.cc",
+        "src/actualized_parameter.cc",
+        "src/formal_parameter.cc",
+        "src/named_formal_parameter.cc",
         "src/newline.cc",
-        "src/param.cc",
         "include/ahoy/parser.h",
     ],
     hdrs = [
-        "include/ahoy/arg.h",
-        "include/ahoy/named_arg.h",
+        "include/ahoy/actualized_parameter.h",
+        "include/ahoy/formal_parameter.h",
+        "include/ahoy/named_formal_parameter.h",
         "include/ahoy/newline.h",
-        "include/ahoy/param.h",
         "include/ahoy/parse_result.h",
         "include/ahoy/parser.h",
     ],
@@ -30,10 +30,10 @@ cc_library(
 cc_test(
     name = "unit_tests",
     srcs = [
-        "tst/arg_ut.cc",
-        "tst/named_arg_ut.cc",
+        "tst/actualized_parameter_ut.cc",
+        "tst/formal_parameter_ut.cc",
+        "tst/named_formal_parameter_ut.cc",
         "tst/newline_ut.cc",
-        "tst/param_ut.cc",
         "tst/parse_result_ut.cc",
         "tst/parser_ut.cc",
     ],
