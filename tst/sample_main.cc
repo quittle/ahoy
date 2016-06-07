@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include <ahoy/ahoy-all.h>
+#include <ahoy/ahoy_all.h>
 
 int main(const int argc, char const * const * const argv) {
     const char param_iterations = 0;

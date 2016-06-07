@@ -1,12 +1,17 @@
-cc_library(
+AHOY_HEADERS = [
+    "include/ahoy/actualized_parameter.h",
+    "include/ahoy/ahoy_all.h",
+    "include/ahoy/formal_parameter.h",
+    "include/ahoy/named_formal_parameter.h",
+    "include/ahoy/newline.h",
+    "include/ahoy/parse_result.h",
+    "include/ahoy/parser.h",
+]
+
+cc_inc_library(
     name = "ahoy",
     deps = [":ahoy_internal"],
-    hdrs = [
-        "include/ahoy/ahoy-all.h",
-    ],
-    includes = [
-        "include",
-    ],
+    hdrs = AHOY_HEADERS,
     visibility = ["//visibility:public"],
 )
 
@@ -19,15 +24,11 @@ cc_library(
         "src/newline.cc",
         "include/ahoy/parser.h",
     ],
-    hdrs = [
-        "include/ahoy/actualized_parameter.h",
-        "include/ahoy/formal_parameter.h",
-        "include/ahoy/named_formal_parameter.h",
-        "include/ahoy/newline.h",
-        "include/ahoy/parse_result.h",
-        "include/ahoy/parser.h",
-    ],
+    hdrs = AHOY_HEADERS,
     copts = ["-Iinclude"],
+    includes = [
+        "include",
+    ],
 )
 
 cc_test(
