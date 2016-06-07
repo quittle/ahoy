@@ -1,6 +1,9 @@
 cc_library(
     name = "ahoy",
     deps = [":ahoy_internal"],
+    hdrs = [
+        "include/ahoy/ahoy-all.h",
+    ],
     includes = [
         "include",
     ],

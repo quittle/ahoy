@@ -3,10 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include "ahoy/actualized_parameter.h"
-#include "ahoy/parser.h"
-#include "ahoy/formal_parameter.h"
-#include "ahoy/named_formal_parameter.h"
+#include <ahoy/ahoy-all.h>
 
 int main(const int argc, char const * const * const argv) {
     const char param_iterations = 0;
