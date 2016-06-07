@@ -11,11 +11,13 @@
 int main(const int argc, char const * const * const argv) {
     const char param_iterations = 0;
     const char param_verbose = 1;
-    const char param_file_name = 2;
+    const char param_help = 2;
+    const char param_file_name = 3;
     const auto parser = ahoy::Parser<char>::Create(
         {
             { param_iterations, { {"i"}, {"iterations"}, "Number of times to run", "3" } },
-            { param_verbose, { {"v"}, {"verbose"}, "Enables verbose logging", true} }
+            { param_verbose, { {"v"}, {"verbose"}, "Enables verbose logging", true } },
+            { param_help, { {"h"}, {"help"}, "Displays help message", true } }
         }, {
             { param_file_name, { "file", "The file to process" } }
         }
@@ -28,6 +30,15 @@ int main(const int argc, char const * const * const argv) {
 
     const ahoy::ParseResult<char> parsed_args = parser.Parse(argc, argv);
 
+    // Non-const so [] can be used
+    std::map<char, ahoy::ActualizedParameter> params = parsed_args.params();
+
+    if (params[param_help].AsBool()) {
+        std::cout << "Displaying help message" << std::endl;
+        std::cout << parser.HelpMessage() << std::endl;
+        return 0;
+    }
+
     if (!parsed_args) {
         std::cerr << "Unable to parse arguments" << std::endl;
         std::cerr << parser.HelpMessage() << std::endl;
@@ -37,12 +48,10 @@ int main(const int argc, char const * const * const argv) {
         return 2;
     }
 
-    // Non-const for easier indexing
-    std::map<char, ahoy::ActualizedParameter> params = parsed_args.params();
-
     const bool verbose = params[param_verbose].AsBool();
     const int iterations = params[param_iterations].AsInt();
     const std::string file_name = params[param_file_name].AsString();
+
 
 
     if (verbose) {
