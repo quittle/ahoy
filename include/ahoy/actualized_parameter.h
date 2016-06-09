@@ -15,7 +15,9 @@ class ActualizedParameter {
 
     std::string AsString() const;
     int AsInt() const;
+    unsigned int AsUInt() const;
     long AsLong() const;
+    unsigned long AsULong() const;
     bool AsBool() const;
 
     bool operator==(const ActualizedParameter& rhs) const;

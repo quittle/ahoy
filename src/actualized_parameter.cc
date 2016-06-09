@@ -1,6 +1,7 @@
 #include "ahoy/actualized_parameter.h"
 
 #include <algorithm>
+#include <climits>
 #include <set>
 #include <stdexcept>
 
@@ -42,8 +43,20 @@ int ActualizedParameter::AsInt() const {
     return stoi(value_);
 }
 
+unsigned int ActualizedParameter::AsUInt() const {
+    const unsigned long value = stoul(value_);
+    if (value > UINT_MAX) {
+        throw std::out_of_range(value_ + " is not in unsigned int range");
+    }
+    return (unsigned int) stol(value_);
+}
+
 long ActualizedParameter::AsLong() const {
     return stol(value_);
+}
+
+unsigned long ActualizedParameter::AsULong() const {
+    return stoul(value_);
 }
 
 bool ActualizedParameter::AsBool() const {
