@@ -1,3 +1,6 @@
+// Copyright (c) 2016 Dustin Doloff
+// Licensed under Apache License v2.0
+
 #include "ahoy/actualized_parameter.h"
 
 #include <algorithm>

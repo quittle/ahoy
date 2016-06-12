@@ -1,3 +1,6 @@
+// Copyright (c) 2016 Dustin Doloff
+// Licensed under Apache License v2.0
+
 #include "ahoy/parse_result.h"
 
 #include "ahoy/actualized_parameter.h"
