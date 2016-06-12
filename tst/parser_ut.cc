@@ -21,8 +21,8 @@ namespace ahoy {
 TEST(Parser, Create_Valid) {
     Parser<int> p = Parser<int>::Create({
         { 0, { {}, {}, kDescription, kDefaultValue} },
-        { 1, { {"f"}, {"flag"}, kDescription} },
-        { 2, { {"flag"}, {"flagflag"}, kDescription, false} }
+        { 1, { {"s"}, {"switch"}, kDescription} },
+        { 2, { {"f"}, {"flag"}, kDescription, true} }
     });
     EXPECT_TRUE(p);
 }

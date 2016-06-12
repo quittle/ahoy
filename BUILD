@@ -26,9 +26,7 @@ cc_library(
     ],
     hdrs = AHOY_HEADERS,
     copts = ["-Iinclude"],
-    includes = [
-        "include",
-    ],
+    includes = ["include"],
 )
 
 cc_test(
