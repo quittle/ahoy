@@ -5,8 +5,8 @@
 build --cxxopt -Wall
 build --cxxopt -Werror
 build --cxxopt -Wextra
-build --cxxopt -Wpedantic
 build --cxxopt -Woverloaded-virtual
+build --cxxopt -Wpedantic
 build --cxxopt -Wsequence-point
 build --cxxopt -Wunused
 build --cxxopt -pedantic-errors
