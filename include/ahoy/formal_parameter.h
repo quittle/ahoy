@@ -7,55 +7,60 @@
 #include <set>
 #include <string>
 
-namespace ahoy {
+#include "ahoy/type.h"
 
+namespace ahoy {
+namespace internal {
+
+// A formal representation of a parameter for the program
 class FormalParameter {
   public:
-    // Flag or Required Switch
-    // If |is_flag| is true, then this builds a flag, which is just a boolean value of if passed in
-    // or not. If false, then it is a required switch with no default value.
-    FormalParameter(const std::set<std::string>& short_forms,
-            const std::set<std::string>& long_forms,
-            const std::string& description,
-            const bool is_flag = false);
-    // Non-required Switch. If this just relied on the implicit constructor, then `char*` would
-    // implicitly have the boolean operator called instead of the std::string constructor
-    FormalParameter(const std::set<std::string>& short_forms,
-            const std::set<std::string>& long_forms,
-            const std::string& description,
-            char const * const default_value);
-    // Non-required Switch
-    FormalParameter(const std::set<std::string>& short_forms,
-            const std::set<std::string>& long_forms,
-            const std::string& description,
-            const std::string& default_value);
+    FormalParameter();
     virtual ~FormalParameter();
 
-    // Returns true if |form| is in it's set of short forms
-    bool HasShortForm(const std::string& form) const;
-    // Returns true if |form| is in it's set of long forms
-    bool HasLongForm(const std::string& form) const;
-    // Returns true if the FormalParameter is a flag or false if it has a string default value
-    bool IsFlag() const;
+    // The name of the parameter
+    const std::string& name() const;
+    void name(const std::string& name);
 
-    const std::set<std::string>& short_forms() const;
-    const std::set<std::string>& long_forms() const;
+    // The description of the parameter
     const std::string& description() const;
-    bool IsRequired() const;
-    // Returns nullptr if the FormalParameter is a flag or required switch, neither of which have a
-    // default value
-    const std::string* default_value() const;
+    void description(const std::string& description);
+
+    // A set of strings that represent the short forms of the parameter
+    // Example: -n, -name representing the name parameter
+    const std::set<std::string>& short_forms() const;
+    void short_forms(const std::set<std::string>& short_forms);
+
+    // A set of strings that represent the long forms of the parameter
+    // Example: --name, --full-name representing the name parameter
+    const std::set<std::string>& long_forms() const;
+    void long_forms(const std::set<std::string>& long_forms);
+
+    // If true, this parameter is required to be passed in as one of the program's arguments
+    bool required() const;
+    void required(const bool required);
+
+    // If true, this parameter does not have a value, but is a flag that indicates a state
+    // Examples: --help, --verbose
+    bool flag() const;
+    void flag(const bool flag);
+
+    // The variable type of the parameter
+    // Examples: string, int, bool
+    Type type() const;
+    void type(const Type type);
 
   private:
-    const std::set<std::string> short_forms_;
-    const std::set<std::string> long_forms_;
-    const std::string description_;
-    const bool required_;
-    const std::string default_value_;
-    // This should be true if the FormalParameter is a boolean flag
-    const bool is_flag_;
+    std::string name_;
+    std::string description_;
+    std::set<std::string> short_forms_;
+    std::set<std::string> long_forms_;
+    bool required_;
+    bool flag_;
+    Type type_;
 };
 
+} // namespace internal
 } // namespace ahoy
 
 #endif // AHOY_AHOY_FORMAL_PARAMETER_H

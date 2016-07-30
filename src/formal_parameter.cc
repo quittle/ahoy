@@ -3,75 +3,67 @@
 
 #include "ahoy/formal_parameter.h"
 
-#include <algorithm>
-#include <set>
-
 namespace ahoy {
+namespace internal {
 
-FormalParameter::FormalParameter(const std::set<std::string>& short_forms,
-                                 const std::set<std::string>& long_forms,
-                                 const std::string& description,
-                                 const bool is_flag) :
-        short_forms_(short_forms),
-        long_forms_(long_forms),
-        description_(description),
-        required_(!is_flag),
-        default_value_(""),
-        is_flag_(is_flag) {}
-
-FormalParameter::FormalParameter(const std::set<std::string>& short_forms,
-                                 const std::set<std::string>& long_forms,
-                                 const std::string& description,
-                                 char const * const default_value) :
-        FormalParameter(short_forms, long_forms, description, std::string(default_value)) {}
-
-FormalParameter::FormalParameter(const std::set<std::string>& short_forms,
-                                 const std::set<std::string>& long_forms,
-                                 const std::string& description,
-                                 const std::string& default_value) :
-        short_forms_(short_forms),
-        long_forms_(long_forms),
-        description_(description),
-        required_(false),
-        default_value_(default_value),
-        is_flag_(false) {}
-
+FormalParameter::FormalParameter() :  required_(false), flag_(false), type_(Type::INVALID) {}
 FormalParameter::~FormalParameter() {}
 
-bool FormalParameter::HasShortForm(const std::string& form) const {
-    return short_forms_.find(form) != short_forms_.end();
+const std::string& FormalParameter::name() const {
+    return name_;
 }
 
-bool FormalParameter::HasLongForm(const std::string& form) const {
-    return long_forms_.find(form) != long_forms_.end();
-}
-
-bool FormalParameter::IsFlag() const {
-    return is_flag_;
-}
-
-const std::set<std::string>& FormalParameter::short_forms() const {
-    return short_forms_;
-}
-
-const std::set<std::string>& FormalParameter::long_forms() const {
-    return long_forms_;
+void FormalParameter::name(const std::string& name) {
+    name_ = name;
 }
 
 const std::string& FormalParameter::description() const {
     return description_;
 }
 
-bool FormalParameter::IsRequired() const {
+void FormalParameter::description(const std::string& description) {
+    description_ = description;
+}
+
+const std::set<std::string>& FormalParameter::short_forms() const {
+    return short_forms_;
+}
+
+void FormalParameter::short_forms(const std::set<std::string>& short_forms) {
+    short_forms_ = short_forms;
+}
+
+const std::set<std::string>& FormalParameter::long_forms() const {
+    return long_forms_;
+}
+
+void FormalParameter::long_forms(const std::set<std::string>& long_forms) {
+    long_forms_ = long_forms;
+}
+
+bool FormalParameter::required() const {
     return required_;
 }
 
-const std::string* FormalParameter::default_value() const {
-    if (is_flag_ || required_) {
-        return nullptr;
-    } else {
-        return &default_value_;
-    }
+void FormalParameter::required(const bool required) {
+    required_ = required;
 }
 
+bool FormalParameter::flag() const {
+    return flag_;
+}
+
+void FormalParameter::flag(const bool flag) {
+    flag_ = flag;
+}
+
+Type FormalParameter::type() const {
+    return type_;
+}
+
+void FormalParameter::type(const Type type) {
+    type_ = type;
+}
+
+} // namespace internal
 } // namespace ahoy

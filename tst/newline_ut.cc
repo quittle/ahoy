@@ -3,16 +3,32 @@
 
 #include "ahoy/newline.h"
 
+#include <sstream>
+
 #include <gtest/gtest.h>
 
 namespace ahoy {
+namespace internal {
 
-TEST(NEWLINE, POSIX) {
+TEST(Newline, NewlineToStream_Posix) {
     EXPECT_EQ("\n", NewlineToString(Newline::POSIX));
 }
 
-TEST(NEWLINE, WINDOWS) {
+TEST(Newline, Stream_Posix) {
+    std::stringstream ss;
+    ss << Newline::POSIX;
+    EXPECT_EQ("\n", ss.str());
+}
+
+TEST(Newline, NewlineToStream_Windows) {
     EXPECT_EQ("\r\n", NewlineToString(Newline::WINDOWS));
 }
 
+TEST(Newline, Stream_Windows) {
+    std::stringstream ss;
+    ss << Newline::WINDOWS;
+    EXPECT_EQ("\r\n", ss.str());
+}
+
+} // namespace internal
 } // namespace ahoy

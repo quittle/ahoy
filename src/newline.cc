@@ -4,19 +4,21 @@
 #include "ahoy/newline.h"
 
 namespace ahoy {
+namespace internal {
 
-std::string NewlineToString(Newline newline) {
+std::string NewlineToString(const Newline newline) {
+    Newline real_newline = newline;
     if (newline == Newline::AUTO) {
 #if defined(WIN_32)
-        newline = Newline::WINDOWS;
+        real_newline = Newline::WINDOWS;
 #else
-        newline = Newline::POSIX;
+        real_newline = Newline::POSIX;
 #endif
     }
 
-    if (newline == Newline::POSIX) {
+    if (real_newline == Newline::POSIX) {
         return "\n";
-    } else if (newline == Newline::WINDOWS) {
+    } else if (real_newline == Newline::WINDOWS) {
         return "\r\n";
     } else {
         // Should never happen, but just in case
@@ -24,4 +26,9 @@ std::string NewlineToString(Newline newline) {
     }
 }
 
+} // namespace internal
 } // namespace ahoy
+
+std::ostream& operator<<(std::ostream& os, const ahoy::Newline& newline) {
+    return os << ahoy::internal::NewlineToString(newline);
+}

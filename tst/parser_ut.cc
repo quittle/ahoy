@@ -3,376 +3,268 @@
 
 #include "ahoy/parser.h"
 
-#include "ahoy/actualized_parameter.h"
-#include "ahoy/formal_parameter.h"
-#include "ahoy/newline.h"
-#include "ahoy/parse_result.h"
-
 #include <gtest/gtest.h>
 
 namespace {
 
-const char kExecutable[] = "./executable";
-const char kDescription[] = "description";
+const char kProgram[] = "./program";
 const char kName[] = "name";
-const char kDefaultValue[] = "default value";
+const char kDescription[] = "description";
+const std::set<std::string> kShortForms = { "short" };
+const std::set<std::string> kLongForms = { "long" };
 
 } // namespace
 
 namespace ahoy {
 
-TEST(Parser, Create_Valid) {
-    Parser<int> p = Parser<int>::Create({
-        { 0, { {}, {}, kDescription, kDefaultValue} },
-        { 1, { {"s"}, {"switch"}, kDescription} },
-        { 2, { {"f"}, {"flag"}, kDescription, true} }
-    });
-    EXPECT_TRUE(p);
-}
+TEST(Parser, Help) {
+    int int_param;
+    std::string string_param;
+    short short_flag;
+    unsigned char positional_uchar;
+    long long required_positional_long_long;
+    bool positional_bool;
 
-TEST(Parser, Create_Invalid_DuplicateSwitches) {
-    Parser<int> p = Parser<int>::Create({
-        { 0, { {}, {}, kDescription, kDefaultValue } },
-        { 1, { {"f"}, {"flag"}, kDescription } },
-        { 2, { {"f"}, {"flag"}, kDescription } }
-    });
-    EXPECT_FALSE(p);
-}
-
-TEST(Parser, Create_Invalid_DuplicateIds) {
-    Parser<int> p = Parser<int>::Create(
-        {
-            { 0, { {}, {}, kDescription, kDefaultValue } },
-            { 1, { {"f"}, {"flag"}, kDescription } },
-        }, {
-            { 2, { "Misorder is fine", kDescription } },
-            { 1, { "Whoops", kDescription } },
-        });
-    EXPECT_FALSE(p);
-}
-
-TEST(Parser, Template) {
-    const FormalParameter param = { {}, {}, kDescription, kDefaultValue };
-    Parser<char>::Create({ { 'c', param } });
-    Parser<int>::Create({ { 0, param } });
-    Parser<long>::Create({ { 0l, param } });
-    Parser<std::string>::Create({ { "string", param } });
-}
-
-TEST(Parser, Help_Windows) {
+    Parser p;
+    p.AddNamedParam(&int_param, Name("Int Param"), Description("Int Param description"),
+                                ShortForms({"ip"}), LongForms({"int-param"}));
+    p.AddNamedParam(&string_param, Name("String Param"), ShortForms({"sp", "string-param"}),
+                                   LongForms({}), Required());
+    p.AddNamedParam(&short_flag, Name("Short Flag"), Flag(), LongForms({"short-flag"}));
+    p.AddPositionalParam(&positional_uchar, Description("Postional UChar description"));
+    p.AddPositionalParam(&required_positional_long_long, Required());
+    p.AddPositionalParam(&positional_bool, Name("Positional Bool"));
     EXPECT_EQ(
-        "-f -foo --foo (Defaults to bar) - Help message 1\r\n"
-        "-w (Required) - Help message 2\r\n"
-        "--long-arg --long-arg-alt (Defaults to true) - Help message 3\r\n"
-        "--flag (Flag) - Enables the flag\r\n"
-        "filename - The file to act on\r\n",
-        Parser<int>::Create(
-            {
-                { 0, { {"f", "foo"}, {"foo"}, "Help message 1", "bar" } },
-                { 1, { {"w"}, {}, "Help message 2" } },
-                { 2, { {}, {"long-arg", "long-arg-alt"}, "Help message 3", "true" } },
-                { 3, { {}, {"flag"}, "Enables the flag", true } }
-            }, {
-                { 4, { "filename", "The file to act on" } }
-            }
-        ).HelpMessage(Newline::WINDOWS)
+        "-ip --int-param [Integer] - Int Param - Int Param description\n"
+        "-sp -string-param (Required) [String] - String Param\n"
+        "--short-flag (Flag) [Short] - Short Flag\n"
+        "[Unsigned Character] - Postional UChar description\n"
+        "(Required) [Long Long]\n"
+        "[Boolean] - Positional Bool\n",
+        p.HelpMessage(Newline::POSIX)
     );
 }
 
-TEST(Parser, Help_Posix) {
-    EXPECT_EQ(
-        "-f -foo --foo (Defaults to bar) - Help message 1\n"
-        "-w (Required) - Help message 2\n"
-        "--long-arg --long-arg-alt (Defaults to true) - Help message 3\n"
-        "--flag (Flag) - Enables the flag\n"
-        "filename - The file to act on\n",
-        Parser<int>::Create(
-            {
-                { 0, { {"f", "foo"}, {"foo"}, "Help message 1", "bar" } },
-                { 1, { {"w"}, {}, "Help message 2" } },
-                { 2, { {}, {"long-arg", "long-arg-alt"}, "Help message 3", "true" } },
-                { 3, { {}, {"flag"}, "Enables the flag", true } }
-            }, {
-                { 4, { "filename", "The file to act on" } }
-            }
-        ).HelpMessage(Newline::POSIX)
-    );
+TEST(Parser, ParamTypesAdded) {
+    bool param_1;
+    char param_2;
+    short param_3;
+    int param_4;
+    long param_5;
+    unsigned long param_6;
+    std::string param_7;
+
+    Parser().AddNamedParam(&param_1)
+            .AddNamedParam(&param_2)
+            .AddNamedParam(&param_3)
+            .AddNamedParam(&param_4)
+            .AddNamedParam(&param_5)
+            .AddNamedParam(&param_6)
+            .AddNamedParam(&param_7);
 }
 
-TEST(Parser, InvalidParser) {
-    char const * const args[2] = { kExecutable, "-f=bar" };
-    const Parser<int> parser = Parser<int>::Create({
-                { 0, { {"f"}, {}, kDescription, kDefaultValue } },
-                { 1, { {"f"}, {}, kDescription, kDefaultValue } },  // Duplicate short switch
-            });
-    EXPECT_FALSE(parser);
-    const ParseResult<int> result = parser.Parse(2, args);
-    EXPECT_FALSE(result);
-    const std::map<int, ActualizedParameter> expected_params = {
-                { 0, "bar" },
-                { 1, kDefaultValue }
-            };
-    EXPECT_EQ(expected_params, result.params());
-    EXPECT_EQ(1, result.errors().size());
+TEST(Parser, OptionsAdded) {
+    bool param;
+    Parser().AddNamedParam(&param, Name(kName), Description(kDescription), ShortForms(kShortForms),
+                                    LongForms(kLongForms), Required());
+    Parser().AddNamedParam(&param, Name(kName), Description(kDescription), ShortForms(kShortForms),
+                                    LongForms(kLongForms), Flag());
+    Parser().AddPositionalParam(&param, Name(kName), Description(kDescription));
 }
 
-TEST(Parser, MissingExecutable) {
-    char const * const * const args = nullptr;
-    const ParseResult<int> result = Parser<int>::Create({}).Parse(0, args);
-    EXPECT_FALSE(result);
-    EXPECT_EQ(0, result.params().size());
-    EXPECT_EQ(1, result.errors().size());
-}
+TEST(Parser, Basic) {
+    bool bool_named_param = false;
+    char char_named_param = -1;
+    unsigned char uchar_flag = -1;
+    short short_named_param = -1;
+    unsigned short ushort_pos_param = -1;
+    int int_flag = -1;
+    unsigned int uint_flag = -1;
+    long long_named_param = -1;
+    unsigned long ulong_pos_param = -1;
+    long long long_long_flag = -1;
+    unsigned long long u_long_long_named_param = -1;
+    float float_pos_param = -1;
+    double double_flag = -1;
+    long double long_double_named_param = -1;
+    std::string string_named_param;
 
-TEST(Parser, Parse_Empty) {
-    char const * args[1] = { "" };
-    const ParseResult<int> result_empty = Parser<int>::Create({}).Parse(1, args);
-    EXPECT_TRUE(result_empty);
-    EXPECT_EQ(0, result_empty.params().size());
-    EXPECT_EQ(0, result_empty.errors().size());
+    Parser p;
+    p.AddNamedParam(&bool_named_param, ShortForms({"arg-1"}));
+    p.AddNamedParam(&char_named_param, LongForms({"char-named-param"}));
+    p.AddNamedParam(&uchar_flag, ShortForms({"uchar"}), Flag());
+    p.AddNamedParam(&short_named_param, LongForms({"short-named-param"}));
+    p.AddPositionalParam(&ushort_pos_param);
+    p.AddNamedParam(&int_flag, ShortForms({"2"}), Flag());
+    p.AddNamedParam(&uint_flag, ShortForms({"uint"}), Flag());
+    p.AddNamedParam(&long_named_param, LongForms({"long-arg"}));
+    p.AddPositionalParam(&ulong_pos_param);
+    p.AddNamedParam(&long_long_flag, ShortForms({"ll"}), Flag());
+    p.AddNamedParam(&u_long_long_named_param, ShortForms({"ull"}));
+    p.AddPositionalParam(&float_pos_param);
+    p.AddNamedParam(&double_flag, LongForms({"double-flag"}), Flag());
+    p.AddNamedParam(&long_double_named_param, LongForms({"long-double-flag"}));
+    p.AddNamedParam(&string_named_param, LongForms({"string"}));
 
-    args[0] = kExecutable;
-    const ParseResult<int> result_executable = Parser<int>::Create({}).Parse(1, args);
-    EXPECT_TRUE(result_executable);
-    EXPECT_EQ(0, result_executable.params().size());
-    EXPECT_EQ(0, result_executable.errors().size());
-}
-
-TEST(Parser, Parse_Simple_NamedParam) {
-    char const * const args[2] = { kExecutable, "/path/to/file" };
-    const ParseResult<int> result = Parser<int>::Create(
-        {},
-        {
-            { 0, { kName, kDescription } }
-        }).Parse(2, args);
-    EXPECT_TRUE(result);
-    const std::map<int, ActualizedParameter> expected_params = { { 0, "/path/to/file" } };
-    EXPECT_EQ(expected_params, result.params());
-    EXPECT_EQ(0, result.errors().size());
-}
-
-TEST(Parser, Parse_Simple_NamedParam_Invalid_UnexpectedArg_ExpectNone) {
-    char const * const args[2] = { kExecutable, "/path/to/file" };
-    const ParseResult<int> result = Parser<int>::Create(
-        {},
-        {}).Parse(2, args);
-    EXPECT_FALSE(result);
-    EXPECT_EQ(0, result.params().size());
-    EXPECT_EQ(1, result.errors().size());
-}
-
-TEST(Parser, Parse_Simple_NamedParam_Invalid_UnexpectedArg_ExpectOne) {
-    char const * const args[3] = { kExecutable, "/path/to/file", "random arg" };
-    const ParseResult<int> result = Parser<int>::Create(
-        {},
-        {
-            { 0, { kName, kDescription } }
-        }).Parse(3, args);
-    EXPECT_FALSE(result);
-    const std::map<int, ActualizedParameter> expected_params = { { 0, "/path/to/file" } };
-    EXPECT_EQ(expected_params, result.params());
-    EXPECT_EQ(1, result.errors().size());
-}
-
-TEST(Parser, Parse_Simple_NamedParam_Invalid_MissingArg) {
-    char const * const args[1] = { kExecutable };
-    const ParseResult<int> result = Parser<int>::Create(
-        {},
-        {
-            { 0, { kName, kDescription } }
-        }).Parse(1, args);
-    EXPECT_FALSE(result);
-    EXPECT_EQ(0, result.params().size());
-    EXPECT_EQ(1, result.errors().size());
-}
-
-TEST(Parser, Parse_Simple_ValidShort_Equals) {
-    char const * const args[2] = { kExecutable, "-f=bar" };
-    const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"f"}, {}, kDescription, kDefaultValue } }
-            }).Parse(2, args);
-    EXPECT_TRUE(result);
-    const std::map<int, ActualizedParameter> expected_params = { { 0, "bar" } };
-    EXPECT_EQ(expected_params, result.params());
-    EXPECT_EQ(0, result.errors().size());
-}
-
-TEST(Parser, Parse_Simple_ValidShort_Space) {
-    char const * const args[3] = { kExecutable, "-f", "bar" };
-    const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"f"}, {}, kDescription, kDefaultValue } }
-            }).Parse(3, args);
-    EXPECT_TRUE(result);
-    const std::map<int, ActualizedParameter> expected_params = { { 0, "bar" } };
-    EXPECT_EQ(expected_params, result.params());
-    EXPECT_EQ(0, result.errors().size());
-}
-
-TEST(Parser, Simple_ValidLong_Equals) {
-    char const * const args[2] = { kExecutable, "--foo=bar" };
-    const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {}, {"foo"}, kDescription, kDefaultValue } }
-            }).Parse(2, args);
-    EXPECT_TRUE(result);
-    const std::map<int, ActualizedParameter> expected_params = { { 0, "bar" } };
-    EXPECT_EQ(expected_params, result.params());
-    EXPECT_EQ(0, result.errors().size());
-}
-
-TEST(Parser, Simple_ValidLong_Space) {
-    char const * const args[3] = { kExecutable, "--foo", "bar" };
-    const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {}, {"foo"}, kDescription, kDefaultValue } }
-            }).Parse(3, args);
-    EXPECT_TRUE(result);
-    const std::map<int, ActualizedParameter> expected_params = { { 0, "bar" } };
-    EXPECT_EQ(expected_params, result.params());
-    EXPECT_EQ(0, result.errors().size());
-}
-
-TEST(Parser, Parse_Simple_Invalid) {
-    char const * const args[2] = { kExecutable, "-f" };
-    const std::map<int, ActualizedParameter> expected_defaulted_params = { { 0, kDefaultValue } };
-    const ParseResult<int> both_empty_result = Parser<int>::Create({
-                { 0, { {}, {}, kDescription, kDefaultValue } }
-            }).Parse(2, args);
-    EXPECT_FALSE(both_empty_result);
-    EXPECT_EQ(expected_defaulted_params, both_empty_result.params());
-    EXPECT_EQ(1, both_empty_result.errors().size());
-
-    const ParseResult<int> short_result = Parser<int>::Create({
-                { 0, { {"f"}, {}, kDescription, kDefaultValue } }
-            }).Parse(2, args);
-    EXPECT_FALSE(short_result);
-    EXPECT_EQ(expected_defaulted_params, short_result.params());
-    EXPECT_EQ(1, short_result.errors().size());
-
-    const ParseResult<int> long_result = Parser<int>::Create({
-                { 0, { {}, {"f"}, kDescription, kDefaultValue } }
-            }).Parse(2, args);
-    EXPECT_FALSE(long_result);
-    EXPECT_EQ(expected_defaulted_params, long_result.params());
-    EXPECT_EQ(1, long_result.errors().size());
-}
-
-TEST(Parser, Parse_Required) {
-    char const * const args[3] = { kExecutable, "-rf", "value" };
-    const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"rf"}, {"requiredField"}, kDescription } }
-            }).Parse(3, args);
-    EXPECT_TRUE(result);
-    const std::map<int, ActualizedParameter> expected_params = { { 0, "value" } };
-    EXPECT_EQ(expected_params, result.params());
-    EXPECT_EQ(0, result.errors().size());
-}
-
-TEST(Parser, Required_Missing) {
-    char const * const args[1] = { kExecutable };
-    const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"requiredField"}, {}, kDescription } }
-            }).Parse(1, args);
-    EXPECT_FALSE(result);
-    EXPECT_EQ(0, result.params().size());
-    EXPECT_EQ(1, result.errors().size());
-}
-
-TEST(Parser, Parse_DefaultValue) {
-    char const * const args[1] = { kExecutable };
-    const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"mf"}, {"missingFiled"}, kDescription, kDefaultValue } }
-            }).Parse(1, args);
-    const std::map<int, ActualizedParameter> expected_params = { { 0, kDefaultValue } };
-    EXPECT_TRUE(result);
-    EXPECT_EQ(expected_params, result.params());
-    EXPECT_EQ(0, result.errors().size());
-}
-
-TEST(Parser, Parse_Flag_Missing) {
-    char const * const args[1] = { kExecutable };
-    const ParseResult<int> result =
-            Parser<int>::Create({ { 0, { {"f"}, {"flag"}, kDescription, true } } })
-                    .Parse(1, args);
-    const std::map<int, ActualizedParameter> expected_params = { { 0, false } };
-    EXPECT_TRUE(result);
-    EXPECT_EQ(expected_params, result.params());
-    EXPECT_EQ(0, result.errors().size());
-}
-
-TEST(Parser, Parse_Flag) {
-    char const * const args[2] = { kExecutable, "--flag" };
-    const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"f"}, {"flag"}, kDescription, true } }
-            }).Parse(2, args);
-    const std::map<int, ActualizedParameter> expected_params = { { 0, true } };
-    EXPECT_TRUE(result);
-    EXPECT_EQ(expected_params, result.params());
-    EXPECT_EQ(0, result.errors().size());
-}
-
-TEST(Parser, Parse_MixedSwitchesAndNamedParams) {
-    char const * const args[7] =
-            { kExecutable, "-flag", "arg 1", "--count", "1", "arg 2", "-f=bar" };
-    const ParseResult<int> result = Parser<int>::Create(
-            {
-                { 0, { {}, {"count"}, kDescription } },
-                { 1, { {"flag"}, {}, kDescription, true } },
-                { 2, { {"f"}, {"foo"}, kDescription, "baz" } },
-            }, {
-                { 3, { kName, kDescription } },
-                { 4, { kName, kDescription } },
-            }).Parse(7, args);
-    EXPECT_TRUE(result);
-    const std::map<int, ActualizedParameter> expected_params = {
-                { 0, "1" },
-                { 1, true },
-                { 2, "bar"},
-                { 3, "arg 1" },
-                { 4, "arg 2" }
-            };
-    EXPECT_EQ(expected_params, result.params());
-    EXPECT_EQ(0, result.errors().size());
-}
-
-TEST(Parser, Parse_Duplicates) {
-    char const * const args[6] =
-        { kExecutable, "-f", "value", "--field=value_2", "-flag", "--flag" };
-    const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"f"}, {"field"}, kDescription } },
-                { 1, { {"flag"}, {"flag"}, kDescription, true } }
-            }).Parse(6, args);
-    EXPECT_FALSE(result);
-    const std::map<int, ActualizedParameter> expected_params = { { 0, "value" }, { 1, true } };
-    EXPECT_EQ(expected_params, result.params());
-    EXPECT_EQ(2, result.errors().size());
-}
-
-TEST(Parser, Parse_Multiple) {
-    char const * const args[9] =
-            { kExecutable,
-              "-f=foo", "--bar", "baz boop", "-enable-everything", "-hey", "hello=world",
-              "/path/to/file.jpg", "100" };
-    const ParseResult<int> result = Parser<int>::Create({
-                { 0, { {"f"}, {"long-f"}, kDescription, kDefaultValue } },
-                { 1, { {"b"}, {"bar"}, kDescription } },
-                { 2, { {"m"}, {"missing"}, kDescription, kDefaultValue } },
-                { 3, { {"hey"}, {"hey"}, kDescription } },
-                { 4, { {"enable-everything"}, {"enable-everything"}, kDescription, true } }
-            }, {
-                { 5, { "file-path", kDescription } },
-                { 6, { "repetitions", kDescription } },
-            }).Parse(9, args);
-    const std::map<int, ActualizedParameter> expected_params = {
-        { 0, "foo" },
-        { 1, "baz boop" },
-        { 2, kDefaultValue },
-        { 3, "hello=world" },
-        { 4, true },
-        { 5, "/path/to/file.jpg" },
-        { 6, "100" }
+    char const * const args[19] = {
+        kProgram,
+        "-arg-1=true",
+        "--char-named-param=4",
+        "-uchar",
+        "--short-named-param=-300",
+        "300",
+        "-2",
+        "-uint",
+        "--long-arg", "345",
+        "998877665544",
+        "-ll",
+        "-ull=12345678901234567890",
+        "1.234",
+        "--double-flag",
+        "--long-double-flag", "22.44",
+        "--string", "string value"
     };
-    EXPECT_TRUE(result);
-    EXPECT_EQ(expected_params, result.params());
-    EXPECT_EQ(0, result.errors().size());
+    EXPECT_TRUE(p.Parse(19, args));
+
+    EXPECT_EQ(true, bool_named_param);
+    EXPECT_EQ('4', char_named_param);
+    EXPECT_EQ(1, uchar_flag);
+    EXPECT_EQ(-300, short_named_param);
+    EXPECT_EQ(300, ushort_pos_param);
+    EXPECT_EQ(1, int_flag);
+    EXPECT_EQ(1, uint_flag);
+    EXPECT_EQ(345, long_named_param);
+    EXPECT_EQ(998877665544LL, ulong_pos_param);
+    EXPECT_EQ(12345678901234567890ULL, u_long_long_named_param);
+    EXPECT_EQ(1.234f, float_pos_param);
+    EXPECT_EQ(1, double_flag);
+    EXPECT_EQ(22.44L, long_double_named_param);
+    EXPECT_EQ("string value", string_named_param);
+}
+
+TEST(Parser, NamedParamOrder) {
+    int param_1 = -1, param_2 = -1, param_3 = -1;
+    Parser p;
+    p.AddNamedParam(&param_1, ShortForms({"1"}));
+    p.AddNamedParam(&param_2, ShortForms({"2"}));
+    p.AddNamedParam(&param_3, ShortForms({"3"}));
+    char const * const args[4] =  { kProgram, "-3=3", "-1=1", "-2=2" };
+    EXPECT_TRUE(p.Parse(4, args));
+
+    EXPECT_EQ(1, param_1);
+    EXPECT_EQ(2, param_2);
+    EXPECT_EQ(3, param_3);
+}
+
+TEST(Parser, PositionalParamOrder) {
+    int param_1 = -1, param_2 = -1, param_3 = -1;
+    bool param_4 = false;
+    Parser p;
+    p.AddPositionalParam(&param_1);
+    p.AddPositionalParam(&param_2);
+    p.AddPositionalParam(&param_3);
+    p.AddNamedParam(&param_4, ShortForms({"4"}), Flag());
+    char const * const args[5] =  { kProgram, "-4", "1", "2", "3" };
+    EXPECT_TRUE(p.Parse(5, args));
+
+    EXPECT_EQ(1, param_1);
+    EXPECT_EQ(2, param_2);
+    EXPECT_EQ(3, param_3);
+    EXPECT_EQ(true, param_4);
+}
+
+TEST(Parser, MultipleFlags) {
+    int param_1 = -1, param_2 = -1;
+
+    Parser p;
+    p.AddNamedParam(&param_1, ShortForms({"p1", "1"}), LongForms({"param1", "param-1", "1"}));
+    p.AddNamedParam(&param_2, ShortForms({"p2", "2"}), LongForms({"param2", "param-2", "2"}));
+
+    char const * const args[11] = {
+        kProgram, "-1=1", "--param-2=2", "--param1=11", "--param2=22", "--1=111", "-p1=1111",
+        "-p2=222", "--1=11111", "--2=2222", "-2=22222" };
+    EXPECT_TRUE(p.Parse(11, args));
+
+    EXPECT_EQ(11111, param_1);
+    EXPECT_EQ(22222, param_2);
+}
+
+TEST(Parser, UnusedParameter) {
+    int param_1 = -1, param_2 = -1, flag_3 = -1;
+
+    Parser p;
+    p.AddNamedParam(&param_1, ShortForms({"1"}));
+    p.AddNamedParam(&param_2, ShortForms({"2"}));
+    p.AddNamedParam(&flag_3, ShortForms({"3"}), Flag());
+
+    char const * const args[2] = { kProgram, "-1=1" };
+
+    EXPECT_TRUE(p.Parse(2, args));
+
+    EXPECT_EQ(1, param_1);
+    EXPECT_EQ(-1, param_2);
+    EXPECT_EQ(0, flag_3);
+}
+
+TEST(Parser, Required_NotMet) {
+    int param_1 = -1, param_2 = -1;
+
+    Parser p;
+    p.AddNamedParam(&param_1, ShortForms({"1"}), Required());
+    p.AddNamedParam(&param_2, ShortForms({"2"}), Required());
+
+    char const * const args[3] = { kProgram, "-1=1", "-1=2" };
+
+    EXPECT_FALSE(p.Parse(3, args));
+
+    EXPECT_EQ(2, param_1);
+    EXPECT_EQ(-1, param_2);
+}
+
+TEST(Parser, Required_Met) {
+    int param_1 = -1, param_2 = -1;
+
+    Parser p;
+    p.AddNamedParam(&param_1, ShortForms({"1"}), Required());
+    p.AddNamedParam(&param_2, ShortForms({"2"}), Required());
+
+    char const * const args[3] = { kProgram, "-1=1", "-2=2" };
+
+    EXPECT_TRUE(p.Parse(3, args));
+
+    EXPECT_EQ(1, param_1);
+    EXPECT_EQ(2, param_2);
+}
+
+TEST(Parser, NotRequired) {
+    int param_1 = -1, param_2 = -1;
+
+    Parser p;
+    p.AddNamedParam(&param_1, ShortForms({"1"}), Required(false));
+    p.AddNamedParam(&param_2, ShortForms({"2"}));
+
+    char const * const args[1] = { kProgram };
+    EXPECT_TRUE(p.Parse(1, args));
+
+    EXPECT_EQ(-1, param_1);
+    EXPECT_EQ(-1, param_2);
+}
+
+TEST(Parser, FlagRequiredChecking) {
+    int param;
+    Parser().AddNamedParam(&param, Description(kDescription));
+    Parser().AddNamedParam(&param, Description(kDescription), Description(kDescription));
+    Parser().AddNamedParam(&param, Description(kDescription), Name(kName));
+    Parser().AddNamedParam(&param, Description(kDescription), Flag());
+    Parser().AddNamedParam(&param, Description(kDescription), Required());
+    Parser().AddNamedParam(&param, Required(), Description(kDescription), Required());
+    Parser().AddNamedParam(&param, Flag(), Description(kDescription), Flag(), Flag());
+}
+
+TEST(Parser, Parse2_ExtraParams) {
+    char const * const args[5] = { kProgram, "--arg1=value1", "-arg2", "2", "positional" };
+    Parser p;
+    EXPECT_FALSE(p.Parse(5, args));
 }
 
 } // namespace ahoy

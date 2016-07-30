@@ -4,86 +4,70 @@
 #include "ahoy/formal_parameter.h"
 
 #include <set>
+#include <string>
+
+#include "ahoy/type.h"
 
 #include <gtest/gtest.h>
 
 namespace {
 
-const std::set<std::string>& kShortForms = { "s", "h", "ort", "forms" };
-const std::set<std::string>& kLongForms = { "long", "forms" };
+const char kName[] = "name";
 const char kDescription[] = "description";
-const char kDefaultValue[] = "default value";
+const std::set<std::string> kShortForms = { "short", "forms" };
+const std::set<std::string> kLongForms = { "long", "forms" };
+const ahoy::internal::Type kType = ahoy::internal::Type::STRING;
+
+const std::set<std::string> kEmptySet;
 
 } // namespace
 
 namespace ahoy {
+namespace internal {
 
-class FormalParameterTest : public ::testing::Test {
-  public:
-    FormalParameterTest() :
-        flag_param_(FormalParameter(kShortForms, kLongForms, kDescription, true)),
-        required_switch_param_(FormalParameter(kShortForms, kLongForms, kDescription, false)),
-        non_required_switch_param_(FormalParameter(kShortForms, kLongForms, kDescription,
-                                                   kDefaultValue)) {}
+TEST(FormalParameter, DefaultValues) {
+    FormalParameter fp;
 
-  protected:
-    const FormalParameter flag_param_;
-    const FormalParameter required_switch_param_;
-    const FormalParameter non_required_switch_param_;
-};
-
-TEST_F(FormalParameterTest, HasShortForm) {
-    EXPECT_TRUE(flag_param_.HasShortForm("s"));
-    EXPECT_TRUE(required_switch_param_.HasShortForm("s"));
-    EXPECT_TRUE(non_required_switch_param_.HasShortForm("s"));
-    EXPECT_FALSE(flag_param_.HasShortForm("long"));
-    EXPECT_FALSE(required_switch_param_.HasShortForm("long"));
-    EXPECT_FALSE(non_required_switch_param_.HasShortForm("long"));
+    EXPECT_EQ("", fp.name());
+    EXPECT_EQ("", fp.description());
+    EXPECT_EQ(kEmptySet, fp.short_forms());
+    EXPECT_EQ(kEmptySet, fp.long_forms());
+    EXPECT_FALSE(fp.required());
+    EXPECT_FALSE(fp.flag());
+    EXPECT_EQ(Type::INVALID, fp.type());
 }
 
-TEST_F(FormalParameterTest, HasLongForms) {
-    EXPECT_FALSE(flag_param_.HasLongForm("s"));
-    EXPECT_FALSE(required_switch_param_.HasLongForm("s"));
-    EXPECT_FALSE(non_required_switch_param_.HasLongForm("s"));
-    EXPECT_TRUE(flag_param_.HasLongForm("long"));
-    EXPECT_TRUE(required_switch_param_.HasLongForm("long"));
-    EXPECT_TRUE(non_required_switch_param_.HasLongForm("long"));
+TEST(FormalParameter, GetSet) {
+    FormalParameter fp;
+
+    EXPECT_NE(kName, fp.name());
+    fp.name(kName);
+    EXPECT_EQ(kName, fp.name());
+
+    EXPECT_NE(kDescription, fp.description());
+    fp.description(kDescription);
+    EXPECT_EQ(kDescription, fp.description());
+
+    EXPECT_NE(kShortForms, fp.short_forms());
+    fp.short_forms(kShortForms);
+    EXPECT_EQ(kShortForms, fp.short_forms());
+
+    EXPECT_NE(kLongForms, fp.long_forms());
+    fp.long_forms(kLongForms);
+    EXPECT_EQ(kLongForms, fp.long_forms());
+
+    EXPECT_FALSE(fp.required());
+    fp.required(true);
+    EXPECT_TRUE(fp.required());
+
+    EXPECT_FALSE(fp.flag());
+    fp.flag(true);
+    EXPECT_TRUE(fp.flag());
+
+    EXPECT_NE(kType, fp.type());
+    fp.type(kType);
+    EXPECT_EQ(kType, fp.type());
 }
 
-TEST_F(FormalParameterTest, IsFlag) {
-    EXPECT_TRUE(flag_param_.IsFlag());
-    EXPECT_FALSE(required_switch_param_.IsFlag());
-    EXPECT_FALSE(non_required_switch_param_.IsFlag());
-}
-
-TEST_F(FormalParameterTest, ShortForms) {
-    EXPECT_EQ(kShortForms, flag_param_.short_forms());
-    EXPECT_EQ(kShortForms, required_switch_param_.short_forms());
-    EXPECT_EQ(kShortForms, non_required_switch_param_.short_forms());
-}
-
-TEST_F(FormalParameterTest, LongForms) {
-    EXPECT_EQ(kLongForms, flag_param_.long_forms());
-    EXPECT_EQ(kLongForms, required_switch_param_.long_forms());
-    EXPECT_EQ(kLongForms, non_required_switch_param_.long_forms());
-}
-
-TEST_F(FormalParameterTest, Required) {
-    EXPECT_FALSE(flag_param_.IsRequired());
-    EXPECT_TRUE(required_switch_param_.IsRequired());
-    EXPECT_FALSE(non_required_switch_param_.IsRequired());
-}
-
-TEST_F(FormalParameterTest, Description) {
-    EXPECT_EQ(kDescription, flag_param_.description());
-    EXPECT_EQ(kDescription, required_switch_param_.description());
-    EXPECT_EQ(kDescription, non_required_switch_param_.description());
-}
-
-TEST_F(FormalParameterTest, DefaultValue) {
-    EXPECT_EQ(nullptr, flag_param_.default_value());
-    EXPECT_EQ(nullptr, required_switch_param_.default_value());
-    EXPECT_EQ(kDefaultValue, *non_required_switch_param_.default_value());
-}
-
+} // namespace internal
 } // namespace ahoy
