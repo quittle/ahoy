@@ -4,8 +4,6 @@
 #include "ahoy/arg_generator.h"
 #include "ahoy/arg_size.h"
 
-// TODO: Remove before checkking in required for cout
-#include <iostream>
 #include <string>
 
 namespace {

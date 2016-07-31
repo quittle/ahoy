@@ -14,12 +14,11 @@ AHOY_HEADERS = [
     "include/ahoy/type.h",
 ]
 
-cc_library(
+cc_inc_library(
     name = "ahoy",
-    deps = [":ahoy_internal"],
+    deps = [ ":ahoy_internal" ],
     hdrs = AHOY_HEADERS,
-    includes = ["include"],
-    visibility = ["//visibility:public"],
+    visibility = [ "//visibility:public" ],
 )
 
 cc_library(
@@ -33,7 +32,9 @@ cc_library(
         "src/type.cc",
     ],
     hdrs = AHOY_HEADERS,
-    copts = [ "-Iinclude" ],
+    # This can't use copts because when Ahoy is included as a third-party package, ahoy_internal
+    # will fail to compile as the headers will no longer be in their expected place.
+    includes = [ "include" ],
 )
 
 cc_test(
@@ -48,7 +49,6 @@ cc_test(
         "tst/static_assert_helper_ut.cc",
         "tst/type_ut.cc",
     ],
-    copts = ["-Iinclude"],
     deps = [
         ":ahoy_internal",
         "@gtest//:gtest",
