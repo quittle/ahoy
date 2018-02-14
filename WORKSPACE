@@ -1,11 +1,10 @@
-# Copyright (c) 2016 Dustin Doloff
+# Copyright (c) 2016, 2018 Dustin Doloff
 # Licensed under Apache License v2.0
 
 workspace(name = "ahoy")
 
-new_git_repository(
-    name = "gtest",
-    commit = "d225acc90bc3a8c420a9bcd1f033033c1ccd7fe0",
-    remote = "https://github.com/google/googletest.git",
-    build_file = "tst/BUILD.gtest"
+git_repository(
+    name = "com_google_googletest",
+    commit = "42140509b6fc2337f8cffe913f6ce1dbf489513b", # master
+    remote = "https://github.com/google/googletest",
 )
