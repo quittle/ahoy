@@ -1,5 +1,7 @@
 # Ahoy
 
+[![Build Status](https://travis-ci.org/quittle/ahoy.svg?branch=master)](https://travis-ci.org/quittle/ahoy)
+
 Ahoy is a class-based argument parser for C++.  Its aim is to be simple and lightweight without all
 the confusing bits that macros bring in or extra depenencies like Boost's program_options.
 
