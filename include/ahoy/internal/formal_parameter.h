@@ -1,13 +1,13 @@
-// Copyright (c) 2016 Dustin Doloff
+// Copyright (c) 2016, 2018 Dustin Doloff
 // Licensed under Apache License v2.0
 
-#ifndef AHOY_AHOY_FORMAL_PARAMETER_H
-#define AHOY_AHOY_FORMAL_PARAMETER_H
+#ifndef AHOY_AHOY_INTERNAL_FORMAL_PARAMETER_H
+#define AHOY_AHOY_INTERNAL_FORMAL_PARAMETER_H
 
 #include <set>
 #include <string>
 
-#include "ahoy/type.h"
+#include "ahoy/internal/type.h"
 
 namespace ahoy {
 namespace internal {
@@ -63,4 +63,4 @@ class FormalParameter {
 } // namespace internal
 } // namespace ahoy
 
-#endif // AHOY_AHOY_FORMAL_PARAMETER_H
+#endif // AHOY_AHOY_INTERNAL_FORMAL_PARAMETER_H

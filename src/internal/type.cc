@@ -1,7 +1,7 @@
-// Copyright (c) 2016 Dustin Doloff
+// Copyright (c) 2016, 2018 Dustin Doloff
 // Licensed under Apache License v2.0
 
-#include "ahoy/type.h"
+#include "ahoy/internal/type.h"
 
 namespace ahoy {
 namespace internal {

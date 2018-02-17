@@ -1,10 +1,10 @@
-// Copyright (c) 2016 Dustin Doloff
+// Copyright (c) 2016, 2018 Dustin Doloff
 // Licensed under Apache License v2.0
 
-#ifndef AHOY_AHOY_ARG_GENERATOR_H
-#define AHOY_AHOY_ARG_GENERATOR_H
+#ifndef AHOY_AHOY_INTERNAL_ARG_GENERATOR_H
+#define AHOY_AHOY_INTERNAL_ARG_GENERATOR_H
 
-#include "ahoy/args.h"
+#include "ahoy/internal/args.h"
 
 namespace ahoy {
 namespace internal {
@@ -62,4 +62,4 @@ class ArgGenerator {
 } // namespace internal
 } // namespace ahoy
 
-#endif // AHOY_AHOY_ARG_GENERATOR_H
+#endif // AHOY_AHOY_INTERNAL_ARG_GENERATOR_H

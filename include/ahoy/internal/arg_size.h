@@ -1,8 +1,8 @@
-// Copyright (c) 2016 Dustin Doloff
+// Copyright (c) 2016, 2018 Dustin Doloff
 // Licensed under Apache License v2.0
 
-#ifndef AHOY_AHOY_ARG_SIZE_H
-#define AHOY_AHOY_ARG_SIZE_H
+#ifndef AHOY_AHOY_INTERNAL_ARG_SIZE_H
+#define AHOY_AHOY_INTERNAL_ARG_SIZE_H
 
 namespace ahoy {
 namespace internal {
@@ -19,4 +19,4 @@ enum class ArgSize {
 } // namespace internal
 } // namespace ahoy
 
-#endif // AHOY_AHOY_ARG_SIZE_H
+#endif // AHOY_AHOY_INTERNAL_ARG_SIZE_H

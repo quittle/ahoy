@@ -1,8 +1,8 @@
-// Copyright (c) 2016 Dustin Doloff
+// Copyright (c) 2016, 2018 Dustin Doloff
 // Licensed under Apache License v2.0
 
-#ifndef AHOY_AHOY_TYPE_H
-#define AHOY_AHOY_TYPE_H
+#ifndef AHOY_AHOY_INTERNAL_TYPE_H
+#define AHOY_AHOY_INTERNAL_TYPE_H
 
 #include <ostream>
 
@@ -35,4 +35,4 @@ std::ostream& operator<<(std::ostream& os, const Type& type);
 } // namespace internal
 } // namespace ahoy
 
-#endif // AHOY_AHOY_TYPE_H
+#endif // AHOY_AHOY_INTERNAL_TYPE_H

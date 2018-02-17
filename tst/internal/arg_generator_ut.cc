@@ -1,9 +1,9 @@
-// Copyright (c) 2016 Dustin Doloff
+// Copyright (c) 2016, 2018 Dustin Doloff
 // Licensed under Apache License v2.0
 
 #include <cstdarg>
 
-#include "ahoy/arg_generator.h"
+#include "ahoy/internal/arg_generator.h"
 
 #include <gtest/gtest.h>
 

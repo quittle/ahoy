@@ -1,8 +1,9 @@
-// Copyright (c) 2016 Dustin Doloff
+// Copyright (c) 2016, 2018 Dustin Doloff
 // Licensed under Apache License v2.0
 
-#include "ahoy/arg_generator.h"
-#include "ahoy/arg_size.h"
+#include "ahoy/internal/arg_generator.h"
+
+#include "ahoy/internal/arg_size.h"
 
 #include <string>
 

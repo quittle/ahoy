@@ -1,18 +1,7 @@
 # Copyright (c) 2016, 2018 Dustin Doloff
 # Licensed under Apache License v2.0
 
-AHOY_HEADERS = [
-    "include/ahoy/ahoy_all.h",
-    "include/ahoy/arg_generator.h",
-    "include/ahoy/arg_size.h",
-    "include/ahoy/args.h",
-    "include/ahoy/formal_parameter.h",
-    "include/ahoy/newline.h",
-    "include/ahoy/options.h",
-    "include/ahoy/parser.h",
-    "include/ahoy/static_assert_helper.h",
-    "include/ahoy/type.h",
-]
+AHOY_HEADERS = glob([ "include/**/*.h" ])
 
 cc_inc_library(
     name = "ahoy",
@@ -23,41 +12,10 @@ cc_inc_library(
 
 cc_library(
     name = "ahoy_internal",
-    srcs = [
-        "src/args.cc",
-        "src/arg_generator.cc",
-        "src/formal_parameter.cc",
-        "src/newline.cc",
-        "src/parser.cc",
-        "src/type.cc",
-    ],
+    srcs = glob([ "src/*", "src/**/*" ]),
     hdrs = AHOY_HEADERS,
     # This can't use copts because when Ahoy is included as a third-party package, ahoy_internal
     # will fail to compile as the headers will no longer be in their expected place.
     includes = [ "include" ],
-)
-
-cc_test(
-    name = "unit_tests",
-    srcs = [
-        "tst/arg_generator_ut.cc",
-        "tst/args_ut.cc",
-        "tst/formal_parameter_ut.cc",
-        "tst/newline_ut.cc",
-        "tst/parser_manual_ut.cc",
-        "tst/parser_ut.cc",
-        "tst/static_assert_helper_ut.cc",
-        "tst/type_ut.cc",
-    ],
-    deps = [
-        ":ahoy_internal",
-        "@com_google_googletest//:gtest_main",
-    ],
-    timeout = "short",
-)
-
-cc_binary(
-    name = "sample",
-    srcs = [ "examples/sample_main.cc" ],
-    deps = [ ":ahoy" ],
+    visibility = [ "//:__subpackages__" ],
 )

@@ -1,12 +1,12 @@
-// Copyright (c) 2016 Dustin Doloff
+// Copyright (c) 2016, 2018 Dustin Doloff
 // Licensed under Apache License v2.0
 
-#ifndef AHOY_AHOY_ARGS_H
-#define AHOY_AHOY_ARGS_H
+#ifndef AHOY_AHOY_INTERNAL_ARGS_H
+#define AHOY_AHOY_INTERNAL_ARGS_H
 
 #include <string>
 
-#include "ahoy/arg_size.h"
+#include "ahoy/internal/arg_size.h"
 
 namespace ahoy {
 namespace internal {
@@ -86,4 +86,4 @@ class PositionalArg {
 } // namespace internal
 } // namespace ahoy
 
-#endif // AHOY_AHOY_ARGS_H
+#endif // AHOY_AHOY_INTERNAL_ARGS_H

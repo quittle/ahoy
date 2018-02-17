@@ -1,8 +1,8 @@
-// Copyright (c) 2016 Dustin Doloff
+// Copyright (c) 2016, 2018 Dustin Doloff
 // Licensed under apache License v2.0
 
-#ifndef AHOY_AHOY_STATIC_ASSERT_HELPER_H
-#define AHOY_AHOY_STATIC_ASSERT_HELPER_H
+#ifndef AHOY_AHOY_INTERNAL_STATIC_ASSERT_HELPER_H
+#define AHOY_AHOY_INTERNAL_STATIC_ASSERT_HELPER_H
 
 #include <type_traits>
 
@@ -52,4 +52,4 @@ template<typename a, typename b> struct does_contain_type_2<a, b> : std::false_t
 } // namespace internal
 } // namespace ahoy
 
-#endif // AHOY_AHOY_STATIC_ASSERT_HELPER_H
+#endif // AHOY_AHOY_INTERNAL_STATIC_ASSERT_HELPER_H

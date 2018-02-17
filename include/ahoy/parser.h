@@ -8,11 +8,11 @@
 #include <string>
 #include <vector>
 
-#include "ahoy/formal_parameter.h"
 #include "ahoy/newline.h"
 #include "ahoy/options.h"
-#include "ahoy/static_assert_helper.h"
-#include "ahoy/type.h"
+#include "ahoy/internal/formal_parameter.h"
+#include "ahoy/internal/static_assert_helper.h"
+#include "ahoy/internal/type.h"
 
 // "Private" macro to generate named and positional parameters for each variable type. This is less
 // risky and more manageble than copy-pasting with slight modifications. These are the public
