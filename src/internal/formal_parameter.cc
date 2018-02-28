@@ -41,6 +41,20 @@ void FormalParameter::long_forms(const std::set<std::string>& long_forms) {
     long_forms_ = long_forms;
 }
 
+std::set<std::string> FormalParameter::forms() const {
+    std::set<std::string> ret;
+
+    for (const std::string& f : long_forms_) {
+        ret.emplace("--" + f);
+    }
+
+    for (const std::string& f : short_forms_) {
+        ret.emplace("-" + f);
+    }
+
+    return ret;
+}
+
 bool FormalParameter::required() const {
     return required_;
 }
@@ -55,6 +69,10 @@ bool FormalParameter::flag() const {
 
 void FormalParameter::flag(const bool flag) {
     flag_ = flag;
+}
+
+bool FormalParameter::is_positional() const {
+    return !(long_forms_.size() || short_forms_.size());
 }
 
 Type FormalParameter::type() const {

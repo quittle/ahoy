@@ -7,8 +7,35 @@
 #include <string>
 
 #include <ahoy/ahoy_all.h>
+#include <ahoy/options2.h>
+
+#include <set> // REMOVE ME
+
+void other_main(const int argc, char const * const * const argv) {
+    std::string file_name;
+    bool passed(false);
+
+    ahoy::Parser parser = ahoy::Parser()
+        .withOptions(
+            ahoy::Option2(&file_name, ahoy::ShortForms({"a"}), ahoy::ShortForms({"a"}), ahoy::Description("this is a description"), ahoy::Name("name"))
+        );
+        // .then(
+        //     ahoy::Option2(&passed)
+        // );
+    const bool success = parser.Parse2(argc, argv);
+
+    std::cout << "OTHER MAIN >>>>>>" << std::endl;
+    std::cout << "Success: " << (success ? "true" : "false") << std::endl;
+    std::cout << "file_name: " << file_name << std::endl;
+    std::cout << "passed: " << passed << std::endl;
+    std::cout << "<<<<<< OTHER MAIN" << std::endl;
+}
 
 int main(const int argc, char const * const * const argv) {
+    // std::set<std::string> vals = { "-a" };
+    // std::cout << (vals.count("-" + std::string("a")) ? "t" : "f");
+    // return 0;
+    other_main(argc, argv);
     // Set default values for parameters
     int iterations = 3;
     bool verbose = false;

@@ -10,6 +10,7 @@
 
 #include "ahoy/newline.h"
 #include "ahoy/options.h"
+#include "ahoy/options2.h"
 #include "ahoy/internal/formal_parameter.h"
 #include "ahoy/internal/static_assert_helper.h"
 #include "ahoy/internal/type.h"
@@ -87,6 +88,21 @@ class Parser {
     Parser();
     virtual ~Parser();
 
+    // TODO: Convert to varargs
+    Parser& withOptions(const std::vector<Option2>& options);
+
+    template <typename... Option2>
+    Parser& withOptions(Option2&&... options) {
+        return withOptions({ std::forward<Option2>(options)... });
+    }
+
+    Parser& then(const std::vector<Option2>& options);
+
+    template <typename... Option2>
+    Parser& then(Option2&&... options) {
+        return then({ std::forward<Option2>(options)... });
+    }
+
     // These macros generate methods in the forms
     //
     // template<Options... options>
@@ -130,6 +146,7 @@ class Parser {
     // if some constraints could not be met, e.g. missing required parameters or parameters that are
     // unsigned but are passed a negative number
     bool Parse(const int argc, char const * const argv[]) const;
+    bool Parse2(const int argc, char const * const argv[]) const;
 
   private:
     // Builds formal parameters from vararg options
@@ -145,6 +162,9 @@ class Parser {
     // Final method to deal with recursively built formal parameters
     void BuildFormalNamedParameter(internal::FormalParameter* /* fp */) {}
     void BuildFormalPositionalParameter(internal::FormalParameter* /* fp */) {}
+
+    std::vector<Option2> current_options_;
+    std::vector<Option2> next_options_;
 
     // All the named pointers, including flags
     std::vector<void*> named_pointers_list_;

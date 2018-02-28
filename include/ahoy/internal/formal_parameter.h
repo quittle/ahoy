@@ -36,6 +36,8 @@ class FormalParameter {
     const std::set<std::string>& long_forms() const;
     void long_forms(const std::set<std::string>& long_forms);
 
+    std::set<std::string> forms() const;
+
     // If true, this parameter is required to be passed in as one of the program's arguments
     bool required() const;
     void required(const bool required);
@@ -44,6 +46,8 @@ class FormalParameter {
     // Examples: --help, --verbose
     bool flag() const;
     void flag(const bool flag);
+
+    bool is_positional() const;
 
     // The variable type of the parameter
     // Examples: string, int, bool

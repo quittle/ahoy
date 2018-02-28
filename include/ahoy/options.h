@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Dustin Doloff
+// Copyright (c) 2016, 2018 Dustin Doloff
 // Licensed under Apache License v2.0
 
 #ifndef AHOY_AHOY_OPTION_H
@@ -6,6 +6,10 @@
 
 #include <set>
 #include <string>
+#include <vector>
+
+#include "ahoy/internal/formal_parameter.h"
+#include "ahoy/internal/static_assert_helper.h"
 
 // "Private" macro to declare and define Parser option classes
 #define _AHOY_OPTIONS_OPTION_CLASS(ClassName, ValueType) \
