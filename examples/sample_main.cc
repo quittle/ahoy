@@ -17,11 +17,12 @@ void other_main(const int argc, char const * const * const argv) {
 
     ahoy::Parser parser = ahoy::Parser()
         .withOptions(
-            ahoy::Option2(&file_name, ahoy::ShortForms({"a"}), ahoy::ShortForms({"a"}), ahoy::Description("this is a description"), ahoy::Name("name"))
+            ahoy::Option2(&file_name, ahoy::ShortForms({"a"}), ahoy::Description("this is a description"), ahoy::Name("name")),
+            ahoy::Option2(&file_name)
+        )
+        .then(
+            ahoy::Option2(&passed)
         );
-        // .then(
-        //     ahoy::Option2(&passed)
-        // );
     const bool success = parser.Parse2(argc, argv);
 
     std::cout << "OTHER MAIN >>>>>>" << std::endl;

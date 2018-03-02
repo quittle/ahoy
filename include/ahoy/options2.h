@@ -71,11 +71,11 @@ class Option2 {
         if (must_consume_) {
             consumed = true;
         } else {
-            if (fp_.is_positional()) {
+            if (fp_.is_positional() && args.size() >= 1) {
                 failed = !Assign(storage_, fp_.type(), args.front());
                 args.pop_front();
                 consumed = true;
-            } else {
+            } else if (args.size() >= 2) {
                 const std::string arg = args.front();
                 if (fp_.forms().count(arg)) {
                     args.pop_front();
@@ -114,6 +114,7 @@ class Option2 {
     bool must_consume_ = false;
 
   private:
+    _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::LongForms, long_forms)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::ShortForms, short_forms)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Name, name)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Description, description)
