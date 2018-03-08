@@ -7,6 +7,7 @@
 #include <list>
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "ahoy/options.h"
@@ -42,25 +43,35 @@ class OptionChecker {
         fp->formal_parameter_value(option_value.get()); \
         BuildFormalNamedParameter(fp, options...); \
     }
+
+#define _AHOY_OPTION2_CTR(PointerType, InternalType) \
+    template<class ...Options> \
+    explicit Option2(PointerType* storage, Options... options) { \
+        OptionChecker<Options...>{}; \
+        fp_.type(InternalType); \
+        BuildFormalNamedParameter(&fp_, options...); \
+        storage_ = storage; \
+    }
+
 namespace ahoy {
 
 class Option2 {
    public:
-    template<class ...Options>
-    explicit Option2(std::string* storage, Options... options) {
-        OptionChecker<Options...>{};
-        fp_.type(internal::Type::STRING);
-        BuildFormalNamedParameter(&fp_, options...);
-        storage_ = storage;
-    }
-
-    template<class ...Options>
-    explicit Option2(bool* storage, Options... options) {
-        OptionChecker<Options...>{};
-        fp_.type(internal::Type::BOOL);
-        BuildFormalNamedParameter(&fp_, options...);
-        storage_ = storage;
-    }
+    _AHOY_OPTION2_CTR(bool, internal::Type::BOOL);
+    _AHOY_OPTION2_CTR(char, internal::Type::CHAR);
+    _AHOY_OPTION2_CTR(unsigned char, internal::Type::U_CHAR);
+    _AHOY_OPTION2_CTR(short, internal::Type::SHORT);
+    _AHOY_OPTION2_CTR(unsigned short, internal::Type::U_SHORT);
+    _AHOY_OPTION2_CTR(int, internal::Type::INT);
+    _AHOY_OPTION2_CTR(unsigned int, internal::Type::U_INT);
+    _AHOY_OPTION2_CTR(long, internal::Type::LONG);
+    _AHOY_OPTION2_CTR(unsigned long, internal::Type::U_LONG);
+    _AHOY_OPTION2_CTR(long long, internal::Type::LONG_LONG);
+    _AHOY_OPTION2_CTR(unsigned long long, internal::Type::U_LONG_LONG);
+    _AHOY_OPTION2_CTR(float, internal::Type::FLOAT);
+    _AHOY_OPTION2_CTR(double, internal::Type::DOUBLE);
+    _AHOY_OPTION2_CTR(long double, internal::Type::LONG_DOUBLE);
+    _AHOY_OPTION2_CTR(std::string, internal::Type::STRING);
 
     virtual ~Option2() {}
 
@@ -70,9 +81,19 @@ class Option2 {
         return *this;
     }
 
+    template <typename... O>
+    Option2& withOptions(O&&... options) {
+        return withOptions({ std::forward<Option2>(options)... });
+    }
+
     Option2& then(const std::vector<Option2>& options) {
         next_options_ = options;
         return *this;
+    }
+
+    template <typename... O>
+    Option2& then(O&&... options) {
+        return then({ std::forward<Option2>(options)... });
     }
 
     bool consume(std::list<std::string>& args) const {

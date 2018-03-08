@@ -88,18 +88,13 @@ class Parser {
     Parser();
     virtual ~Parser();
 
-    // TODO: Convert to varargs
-    Parser& withOptions(const std::vector<Option2>& options);
-
-    template <typename... Option2>
-    Parser& withOptions(Option2&&... options) {
+    template <typename... O>
+    Parser& withOptions(O&&... options) {
         return withOptions({ std::forward<Option2>(options)... });
     }
 
-    Parser& then(const std::vector<Option2>& options);
-
-    template <typename... Option2>
-    Parser& then(Option2&&... options) {
+    template <typename... O>
+    Parser& then(O&&... options) {
         return then({ std::forward<Option2>(options)... });
     }
 
@@ -149,6 +144,9 @@ class Parser {
     bool Parse2(const int argc, char const * const argv[]) const;
 
   private:
+    Parser& withOptions(const std::vector<Option2>& options);
+    Parser& then(const std::vector<Option2>& options);
+
     // Builds formal parameters from vararg options
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(Name, name)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(Description, description)
