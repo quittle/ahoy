@@ -25,8 +25,8 @@
 template <typename... Options>
 class OptionChecker {
     _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(ahoy::Flag, ahoy::Required);
-    _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(ahoy::ShortForms, ahoy::Marker);
-    _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(ahoy::LongForms, ahoy::Marker);
+    _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(ahoy::ShortForms, ahoy::Flag);
+    _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(ahoy::LongForms, ahoy::Flag);
     // // Check that Options does not contain both ahoy::Flag and ahoy::Required
     // static_assert(!ahoy::internal::does_contain_type_2<ahoy::Flag, ahoy::Required, Options...>::value,
     //               "Named parameter may not be both an ahoy::Flag and ahoy::Required.");
@@ -104,7 +104,11 @@ class Option2 {
             consumed = true;
         } else {
             if (fp_.is_positional() && args.size() >= 1) {
-                failed = !Assign(storage_, fp_.type(), args.front());
+                if (fp_.flag()) {
+                    failed = !Assign(storage_, fp_.type(), true);
+                } else {
+                    failed = !Assign(storage_, fp_.type(), args.front());
+                }
                 args.pop_front();
                 consumed = true;
             } else if (args.size() >= 2) {
@@ -149,12 +153,13 @@ class Option2 {
     bool must_consume_ = false;
 
   private:
-    _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Marker, marker)
+    // _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Marker, marker)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::LongForms, long_forms)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::ShortForms, short_forms)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Name, name)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Description, description)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Required, required)
+    _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Flag, flag)
     static void BuildFormalNamedParameter(internal::FormalParameter*) {}
 
     void* storage_;

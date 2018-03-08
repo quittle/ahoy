@@ -14,6 +14,10 @@ const char kProgram[] = "./program";
 const char kValue[] = "value";
 const char kValue2[] = "value 2";
 
+bool consume(const ahoy::Option2& o, std::list<std::string> args) {
+    return o.consume(args);
+}
+
 } // namespace
 
 namespace ahoy {
@@ -66,6 +70,66 @@ TEST(Option2, Chaining) {
         .withOptions(
             o.withOptions(Option2(p)),
             o.then(o));
+}
+
+TEST(Option2, ShortForms) {
+    std::string value;
+
+    const Option2 o(&value, ShortForms({"v"}));
+
+    EXPECT_FALSE(consume(o, {}));
+    EXPECT_EQ("", value);
+
+    EXPECT_FALSE(consume(o, { "-v" }));
+    EXPECT_EQ("", value);
+
+    EXPECT_FALSE(consume(o, { "-o" }));
+    EXPECT_EQ("", value);
+
+    EXPECT_TRUE(consume(o, { "-v", kValue }));
+    EXPECT_EQ(kValue, value);
+}
+
+TEST(Option2, LongForms) {
+    std::string value;
+
+    const Option2 o(&value, LongForms({"v"}));
+
+    EXPECT_FALSE(consume(o, {}));
+    EXPECT_EQ("", value);
+
+    EXPECT_FALSE(consume(o, { "--v" }));
+    EXPECT_EQ("", value);
+
+    EXPECT_FALSE(consume(o, { "--o" }));
+    EXPECT_EQ("", value);
+
+    EXPECT_TRUE(consume(o, { "--v", kValue }));
+    EXPECT_EQ(kValue, value);
+}
+
+TEST(Option2, Flag) {
+    std::string value;
+
+    const Option2 o(&value, Flag());
+
+    EXPECT_FALSE(consume(o, {}));
+    EXPECT_EQ("", value);
+
+    EXPECT_TRUE(consume(o, { kValue }));
+    EXPECT_EQ("true", value);
+}
+
+TEST(Option2, Literal) {
+    std::string value;
+
+    const Option2 o(&value);
+
+    EXPECT_FALSE(consume(o, {}));
+    EXPECT_EQ("", value);
+
+    EXPECT_TRUE(consume(o, { kValue }));
+    EXPECT_EQ(kValue, value);
 }
 
 } // namespace ahoy

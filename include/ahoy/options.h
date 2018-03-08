@@ -52,13 +52,13 @@ class Option {
 // ahoy::Description("My description")
 // ahoy::ShortForms({"form-1", "form-2"})
 // ahoy::Flag()
-_AHOY_OPTIONS_OPTION_CLASS(Description, std::string);
-_AHOY_OPTIONS_OPTION_CLASS(Name, std::string);
-_AHOY_OPTIONS_OPTION_CLASS(Marker, std::string);
-_AHOY_OPTIONS_OPTION_CLASS(ShortForms, std::set<std::string>);
-_AHOY_OPTIONS_OPTION_CLASS(LongForms, std::set<std::string>);
-_AHOY_OPTIONS_OPTION_CLASS_DEFAULT(Required, bool, true);
-_AHOY_OPTIONS_OPTION_CLASS_DEFAULT(Flag, bool, true);
+_AHOY_OPTIONS_OPTION_CLASS(Description, std::string); // Human readable description of the argument
+_AHOY_OPTIONS_OPTION_CLASS(Name, std::string); // Human readable name of the argument
+// _AHOY_OPTIONS_OPTION_CLASS_DEFAULT(Marker, std::string, ""); // Indicator for branching. Value is the same as the argument
+_AHOY_OPTIONS_OPTION_CLASS(ShortForms, std::set<std::string>); // Short arguments, like -h or -v
+_AHOY_OPTIONS_OPTION_CLASS(LongForms, std::set<std::string>); // Long arguments, like --help or --verbose
+_AHOY_OPTIONS_OPTION_CLASS_DEFAULT(Required, bool, true); // Advances option, indicating the option must be set
+_AHOY_OPTIONS_OPTION_CLASS_DEFAULT(Flag, bool, true); // Like marker, but sets the value to true if present
 
 } // namespace ahoy
 
