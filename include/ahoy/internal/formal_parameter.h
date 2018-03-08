@@ -38,6 +38,9 @@ class FormalParameter {
 
     std::set<std::string> forms() const;
 
+    const std::string& marker() const;
+    void marker(const std::string& marker);
+
     // If true, this parameter is required to be passed in as one of the program's arguments
     bool required() const;
     void required(const bool required);
@@ -59,6 +62,7 @@ class FormalParameter {
     std::string description_;
     std::set<std::string> short_forms_;
     std::set<std::string> long_forms_;
+    std::string marker_;
     bool required_;
     bool flag_;
     Type type_;

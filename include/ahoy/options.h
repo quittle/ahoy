@@ -54,6 +54,7 @@ class Option {
 // ahoy::Flag()
 _AHOY_OPTIONS_OPTION_CLASS(Description, std::string);
 _AHOY_OPTIONS_OPTION_CLASS(Name, std::string);
+_AHOY_OPTIONS_OPTION_CLASS(Marker, std::string);
 _AHOY_OPTIONS_OPTION_CLASS(ShortForms, std::set<std::string>);
 _AHOY_OPTIONS_OPTION_CLASS(LongForms, std::set<std::string>);
 _AHOY_OPTIONS_OPTION_CLASS_DEFAULT(Required, bool, true);

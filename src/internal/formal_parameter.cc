@@ -55,6 +55,14 @@ std::set<std::string> FormalParameter::forms() const {
     return ret;
 }
 
+const std::string& FormalParameter::marker() const {
+    return marker_;
+}
+
+void FormalParameter::marker(const std::string& marker) {
+    marker_ = marker;
+}
+
 bool FormalParameter::required() const {
     return required_;
 }

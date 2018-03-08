@@ -131,8 +131,8 @@ bool Parser::Parse2(const int argc, char const * const argv[]) const {
     Option2 root((bool*) nullptr);
     root.must_consume_ = true;
     root.withOptions(current_options_).then(next_options_);
-    root.consume(args);
-    return args.size() == 0;
+    const bool success = root.consume(args);
+    return success && args.size() == 0;
 }
 
 bool Parser::Parse(const int argc, char const * const argv[]) const {

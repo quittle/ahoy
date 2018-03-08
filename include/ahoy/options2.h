@@ -16,12 +16,23 @@
 
 #include <iostream> // REMOVE ME
 
+#define _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(a, b) \
+    static_assert(!ahoy::internal::does_contain_type_2<b, a, Options...>::value, \
+                  "Named parameter may not be both an #a and #b.")
+
 // Validates the varargs of options
 template <typename... Options>
 class OptionChecker {
-    // Check that Options does not contain both ahoy::Flag and ahoy::Required
-    static_assert(!ahoy::internal::does_contain_type_2<ahoy::Flag, ahoy::Required, Options...>::value,
-                  "Named parameter may not be both an ahoy::Flag and ahoy::Required.");
+    _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(ahoy::Flag, ahoy::Required);
+    _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(ahoy::ShortForms, ahoy::Marker);
+    _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(ahoy::LongForms, ahoy::Marker);
+    // // Check that Options does not contain both ahoy::Flag and ahoy::Required
+    // static_assert(!ahoy::internal::does_contain_type_2<ahoy::Flag, ahoy::Required, Options...>::value,
+    //               "Named parameter may not be both an ahoy::Flag and ahoy::Required.");
+    // static_assert(!ahoy::internal::does_contain_type_2<ahoy::ShortForms, ahoy::Marker, Options...>::value,
+    //               "Named parameter may not be both an ahoy::Flag and ahoy::Required.");
+    // static_assert(!ahoy::internal::does_contain_type_2<ahoy::LongForms, ahoy::Marker, Options...>::value,
+    //               "Named parameter may not be both an ahoy::Flag and ahoy::Required.");
 };
 
 #define _AHOY_PARSER_BUILD_FORMAL_PARAMETER(OptionClass, formal_parameter_value) \
@@ -100,12 +111,15 @@ class Option2 {
                 option.consume(args);
             }
 
+            if (next_options_.size() == 0) {
+                return true;
+            }
+
             for (const Option2& option : next_options_) {
                 if (option.consume(args)) {
-                    break;
+                    return true;
                 }
             }
-            return true;
         }
 
         return false;
@@ -114,6 +128,7 @@ class Option2 {
     bool must_consume_ = false;
 
   private:
+    _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Marker, marker)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::LongForms, long_forms)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::ShortForms, short_forms)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Name, name)
