@@ -28,15 +28,13 @@ class FormalParameter {
 
     // A set of strings that represent the short forms of the parameter
     // Example: -n, -name representing the name parameter
-    const std::set<std::string>& short_forms() const;
     void short_forms(const std::set<std::string>& short_forms);
 
     // A set of strings that represent the long forms of the parameter
     // Example: --name, --full-name representing the name parameter
-    const std::set<std::string>& long_forms() const;
     void long_forms(const std::set<std::string>& long_forms);
 
-    std::set<std::string> forms() const;
+    const std::set<std::string>& forms() const;
 
     const std::string& marker() const;
     void marker(const std::string& marker);
@@ -60,8 +58,7 @@ class FormalParameter {
   private:
     std::string name_;
     std::string description_;
-    std::set<std::string> short_forms_;
-    std::set<std::string> long_forms_;
+    std::set<std::string> forms_;
     std::string marker_;
     bool required_;
     bool flag_;

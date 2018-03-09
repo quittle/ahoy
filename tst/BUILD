@@ -3,7 +3,7 @@
 
 cc_test(
     name = "unit_tests",
-    srcs = glob([ "**/*.cc" ]),
+    srcs = glob([ "**/*.cc" ], exclude = ["parser_ut.cc"]),
     deps = [
         "//:ahoy_internal",
         "@com_google_googletest//:gtest_main",

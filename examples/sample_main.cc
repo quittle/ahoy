@@ -62,17 +62,17 @@ int main(const int argc, char const * const * const argv) {
 
     // Current limitation of parser does not allow branching so missing, required parameters will
     // fail the parsing even if the help parametrer is passed in
-    const bool parse_success = parser.Parse(argc, argv);
+    const bool parse_success = true;//parser.Parse(argc, argv);
 
     if (help) {
         std::cout << "Displaying help message" << std::endl;
-        std::cout << parser.HelpMessage() << std::endl;
+        // std::cout << parser.HelpMessage() << std::endl;
         return 0;
     }
 
     if (!parse_success) {
         std::cerr << "Unable to parse arguments" << std::endl;
-        std::cerr << parser.HelpMessage() << std::endl;
+        // std::cerr << parser.HelpMessage() << std::endl;
         return 1;
     }
 

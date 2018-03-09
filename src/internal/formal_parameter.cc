@@ -25,34 +25,20 @@ void FormalParameter::description(const std::string& description) {
     description_ = description;
 }
 
-const std::set<std::string>& FormalParameter::short_forms() const {
-    return short_forms_;
-}
-
 void FormalParameter::short_forms(const std::set<std::string>& short_forms) {
-    short_forms_ = short_forms;
-}
-
-const std::set<std::string>& FormalParameter::long_forms() const {
-    return long_forms_;
+    for (const std::string& form : short_forms) {
+        forms_.emplace("-" + form);
+    }
 }
 
 void FormalParameter::long_forms(const std::set<std::string>& long_forms) {
-    long_forms_ = long_forms;
+    for (const std::string& form : long_forms) {
+        forms_.emplace("--" + form);
+    }
 }
 
-std::set<std::string> FormalParameter::forms() const {
-    std::set<std::string> ret;
-
-    for (const std::string& f : long_forms_) {
-        ret.emplace("--" + f);
-    }
-
-    for (const std::string& f : short_forms_) {
-        ret.emplace("-" + f);
-    }
-
-    return ret;
+const std::set<std::string>& FormalParameter::forms() const {
+    return forms_;
 }
 
 const std::string& FormalParameter::marker() const {
@@ -80,7 +66,7 @@ void FormalParameter::flag(const bool flag) {
 }
 
 bool FormalParameter::is_positional() const {
-    return !(long_forms_.size() || short_forms_.size());
+    return forms_.size() == 0;
 }
 
 Type FormalParameter::type() const {

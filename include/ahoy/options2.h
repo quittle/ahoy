@@ -75,7 +75,6 @@ class Option2 {
 
     virtual ~Option2() {}
 
-    // TODO: Convert to vararg
     Option2& withOptions(const std::vector<Option2>& options) {
         current_options_ = options;
         return *this;
@@ -153,7 +152,6 @@ class Option2 {
     bool must_consume_ = false;
 
   private:
-    // _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Marker, marker)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::LongForms, long_forms)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::ShortForms, short_forms)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Name, name)
