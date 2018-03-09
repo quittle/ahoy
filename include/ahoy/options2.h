@@ -27,15 +27,22 @@ class OptionChecker {
     _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(ahoy::Flag, ahoy::Required);
     _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(ahoy::ShortForms, ahoy::Flag);
     _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(ahoy::LongForms, ahoy::Flag);
-    // // Check that Options does not contain both ahoy::Flag and ahoy::Required
-    // static_assert(!ahoy::internal::does_contain_type_2<ahoy::Flag, ahoy::Required, Options...>::value,
-    //               "Named parameter may not be both an ahoy::Flag and ahoy::Required.");
-    // static_assert(!ahoy::internal::does_contain_type_2<ahoy::ShortForms, ahoy::Marker, Options...>::value,
-    //               "Named parameter may not be both an ahoy::Flag and ahoy::Required.");
-    // static_assert(!ahoy::internal::does_contain_type_2<ahoy::LongForms, ahoy::Marker, Options...>::value,
-    //               "Named parameter may not be both an ahoy::Flag and ahoy::Required.");
 };
 
+// These macros generate methods in the form
+//
+// template<Options... options>
+// Parser& BuildFormalNamedParameter(bool*, Options...);
+//
+// The first argument is a pointer to memory to hold the parameters value once parsed. The type
+// will enforce characteristics of arguments when parsing. e.g. a parameter whose type is int*
+// will cause Parse to return false if "/tmp/file" is passed by the user because it cannot be
+// interpreted as an int.
+//
+// The rest of the arguments are options to define the type of the parameter.
+// e.g. parser.AddPostionalParam(&param, ahoy::Required(), ahoy::Name("Param Name"));
+//
+// They return a reference to the original Parser for method chaining.
 #define _AHOY_PARSER_BUILD_FORMAL_PARAMETER(OptionClass, formal_parameter_value) \
     template<class ...Options> \
     static void BuildFormalNamedParameter(internal::FormalParameter* fp, const OptionClass& option_value, \
@@ -96,36 +103,33 @@ class Option2 {
     }
 
     bool consume(std::list<std::string>& args) const {
-        bool failed = false;
-        bool consumed = false;
+        bool consumed(false);
 
-        if (must_consume_) {
-            consumed = true;
-        } else {
-            if (fp_.is_positional() && args.size() >= 1) {
-                if (fp_.flag()) {
-                    failed = !Assign(storage_, fp_.type(), true);
-                } else {
-                    failed = !Assign(storage_, fp_.type(), args.front());
+        if (fp_.is_positional() && args.size() >= 1) {
+            if (fp_.flag()) {
+                if (!Assign(storage_, fp_.type(), true)) {
+                    return false;
                 }
+            } else if (!Assign(storage_, fp_.type(), args.front())) {
+                return false;
+            }
+            args.pop_front();
+            consumed = true;
+        } else if (args.size() >= 2) {
+            const std::string arg = args.front();
+            if (fp_.forms().count(arg)) {
                 args.pop_front();
-                consumed = true;
-            } else if (args.size() >= 2) {
-                const std::string arg = args.front();
-                if (fp_.forms().count(arg)) {
-                    args.pop_front();
-                    if (fp_.flag()) {
-                        failed = !Assign(storage_, fp_.type(), true);
-                        consumed = true;
-                    } else {
-                        if (args.size() == 0) {
-                          failed = true;
-                        } else {
-                            failed = !Assign(storage_, fp_.type(), args.front());
-                            args.pop_front();
-                            consumed = true;
-                        }
+                if (fp_.flag()) {
+                    if (!Assign(storage_, fp_.type(), true)) {
+                        return false;
                     }
+                    consumed = true;
+                } else {
+                    if (!Assign(storage_, fp_.type(), args.front())) {
+                        return false;
+                    }
+                    args.pop_front();
+                    consumed = true;
                 }
             }
         }
@@ -148,8 +152,6 @@ class Option2 {
 
         return false;
     }
-
-    bool must_consume_ = false;
 
   private:
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::LongForms, long_forms)

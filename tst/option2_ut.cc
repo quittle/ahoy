@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Dustin Doloff
+// Copyright (c) 2018 Dustin Doloff
 // Licensed under Apache License v2.0
 
 #include "ahoy/options2.h"
@@ -10,7 +10,6 @@
 
 namespace {
 
-const char kProgram[] = "./program";
 const char kValue[] = "value";
 const char kValue2[] = "value 2";
 
@@ -130,6 +129,17 @@ TEST(Option2, Literal) {
 
     EXPECT_TRUE(consume(o, { kValue }));
     EXPECT_EQ(kValue, value);
+}
+
+TEST(Option2, TypeMismatch) {
+    int i;
+    unsigned short us;
+    // bool b;
+
+    EXPECT_FALSE(consume(Option2(&i), {"a"})) << i;
+    EXPECT_FALSE(consume(Option2(&i), {"12345678901234567890"})) << i;
+    EXPECT_FALSE(consume(Option2(&us), {"a"})) << us;
+    EXPECT_FALSE(consume(Option2(&us), {"-1"})) << us;
 }
 
 } // namespace ahoy

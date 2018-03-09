@@ -31,9 +31,9 @@ Parser& Parser::then(const std::vector<Option2>& options) {
 }
 
 bool Parser::Parse2(const int argc, char const * const argv[]) const {
-    std::list<std::string> args(argv + 1, argv + argc);
-    Option2 root((bool*) nullptr);
-    root.must_consume_ = true;
+    std::list<std::string> args(argv, argv + argc);
+    std::string program_name;
+    Option2 root(&program_name);
     root.withOptions(current_options_).then(next_options_);
     const bool success = root.consume(args);
     return success && args.size() == 0;
