@@ -140,7 +140,6 @@ class Parser {
     // via the add param methods. Returns true if the arguments were parsed successfully and false
     // if some constraints could not be met, e.g. missing required parameters or parameters that are
     // unsigned but are passed a negative number
-    bool Parse(const int argc, char const * const argv[]) const;
     bool Parse2(const int argc, char const * const argv[]) const;
 
   private:

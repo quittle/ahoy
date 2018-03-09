@@ -66,13 +66,11 @@ int main(const int argc, char const * const * const argv) {
 
     if (help) {
         std::cout << "Displaying help message" << std::endl;
-        // std::cout << parser.HelpMessage() << std::endl;
         return 0;
     }
 
     if (!parse_success) {
         std::cerr << "Unable to parse arguments" << std::endl;
-        // std::cerr << parser.HelpMessage() << std::endl;
         return 1;
     }
 
