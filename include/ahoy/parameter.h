@@ -79,78 +79,29 @@ class Parameter {
     _AHOY_PARAMETER_CTR(long double, internal::Type::LONG_DOUBLE);
     _AHOY_PARAMETER_CTR(std::string, internal::Type::STRING);
 
-    virtual ~Parameter() {}
+    virtual ~Parameter();
 
-    Parameter& withOptions(const std::vector<Parameter>& parameters) {
-        current_options_ = parameters;
-        return *this;
-    }
+    // Sets optional parameters that follow the current one
+    Parameter& withOptions(const std::vector<Parameter>& parameters);
 
+    // Sets optional parameters that follow the current one
     template <typename... P>
     Parameter& withOptions(P&&... parameters) {
         return withOptions({ std::forward<Parameter>(parameters)... });
     }
 
-    Parameter& then(const std::vector<Parameter>& parameters) {
-        next_options_ = parameters;
-        return *this;
-    }
+    // Sets required parameters that must follow the current one
+    Parameter& then(const std::vector<Parameter>& parameters);
 
+    // Sets required parameters that must follow the current one
     template <typename... P>
     Parameter& then(P&&... parameters) {
         return then({ std::forward<Parameter>(parameters)... });
     }
 
-    bool consume(std::list<std::string>& args) const {
-        bool consumed(false);
-
-        if (fp_.is_positional() && args.size() >= 1) {
-            if (fp_.flag()) {
-                if (!Assign(storage_, fp_.type(), true)) {
-                    return false;
-                }
-            } else if (!Assign(storage_, fp_.type(), args.front())) {
-                return false;
-            }
-            args.pop_front();
-            consumed = true;
-        } else if (args.size() >= 2) {
-            const std::string arg = args.front();
-            if (fp_.forms().count(arg)) {
-                args.pop_front();
-                if (fp_.flag()) {
-                    if (!Assign(storage_, fp_.type(), true)) {
-                        return false;
-                    }
-                    consumed = true;
-                } else {
-                    if (!Assign(storage_, fp_.type(), args.front())) {
-                        return false;
-                    }
-                    args.pop_front();
-                    consumed = true;
-                }
-            }
-        }
-
-        if (consumed) {
-            for (const Parameter& parameter : current_options_) {
-                parameter.consume(args);
-            }
-
-            if (next_options_.size() == 0) {
-                return true;
-            }
-
-            for (const Parameter& parameter : next_options_) {
-                if (parameter.consume(args)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
+    // Greedily consumes arguments and sets this and dependent parameter values, returning true if
+    // succesful. If unsuccessful, the value stored by the pointer passed in may be modified.
+    bool consume(std::list<std::string>& args) const;
 
   private:
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::LongForms, long_forms)
@@ -159,7 +110,7 @@ class Parameter {
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Description, description)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Required, required)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Flag, flag)
-    static void BuildFormalNamedParameter(internal::FormalParameter*) {}
+    static void BuildFormalNamedParameter(internal::FormalParameter*);
 
     void* storage_;
     internal::FormalParameter fp_;
