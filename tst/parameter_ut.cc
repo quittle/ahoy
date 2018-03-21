@@ -1,7 +1,7 @@
 // Copyright (c) 2018 Dustin Doloff
 // Licensed under Apache License v2.0
 
-#include "ahoy/options2.h"
+#include "ahoy/parameter.h"
 
 #include <memory>
 #include <vector>

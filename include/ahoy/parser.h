@@ -10,7 +10,7 @@
 
 #include "ahoy/newline.h"
 #include "ahoy/options.h"
-#include "ahoy/options2.h"
+#include "ahoy/parameter.h"
 #include "ahoy/internal/formal_parameter.h"
 #include "ahoy/internal/static_assert_helper.h"
 #include "ahoy/internal/type.h"

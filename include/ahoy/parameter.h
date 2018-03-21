@@ -1,8 +1,8 @@
 // Copyright (c) 2016, 2018 Dustin Doloff
 // Licensed under Apache License v2.0
 
-#ifndef AHOY_AHOY_OPTIONS2_H
-#define AHOY_AHOY_OPTIONS2_H
+#ifndef AHOY_AHOY_PARAMETER_H
+#define AHOY_AHOY_PARAMETER_H
 
 #include <list>
 #include <set>
@@ -15,18 +15,16 @@
 #include "ahoy/internal/formal_parameter.h"
 #include "ahoy/internal/static_assert_helper.h"
 
-#include <iostream> // REMOVE ME
-
-#define _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(a, b) \
+#define _AHOY_PARAMETER_STATIC_ASSERT_NOT_BOTH(a, b) \
     static_assert(!ahoy::internal::does_contain_type_2<b, a, Options...>::value, \
-                  "Named parameter may not be both an #a and #b.")
+                  "Parameter may not be both an #a and #b.")
 
 // Validates the varargs of options
 template <typename... Options>
 class OptionChecker {
-    _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(ahoy::Flag, ahoy::Required);
-    _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(ahoy::ShortForms, ahoy::Flag);
-    _AHOY_OPTIONS2_STATIC_ASSERT_NOT_BOTH(ahoy::LongForms, ahoy::Flag);
+    _AHOY_PARAMETER_STATIC_ASSERT_NOT_BOTH(ahoy::Flag, ahoy::Required);
+    _AHOY_PARAMETER_STATIC_ASSERT_NOT_BOTH(ahoy::ShortForms, ahoy::Flag);
+    _AHOY_PARAMETER_STATIC_ASSERT_NOT_BOTH(ahoy::LongForms, ahoy::Flag);
 };
 
 // These macros generate methods in the form
@@ -172,4 +170,4 @@ class Parameter {
 
 } // namespace ahoy
 
-#endif // AHOY_AHOY_OPTIONS2_H
+#endif // AHOY_AHOY_PARAMETER_H

@@ -7,9 +7,6 @@
 #include <string>
 
 #include <ahoy/ahoy_all.h>
-#include <ahoy/options2.h>
-
-#include <set> // REMOVE ME
 
 void other_main(const int argc, char const * const * const argv) {
     std::string file_name;
