@@ -134,12 +134,14 @@ TEST(Option2, Literal) {
 TEST(Option2, TypeMismatch) {
     int i;
     unsigned short us;
-    // bool b;
+    bool b;
 
-    EXPECT_FALSE(consume(Option2(&i), {"a"})) << i;
-    EXPECT_FALSE(consume(Option2(&i), {"12345678901234567890"})) << i;
-    EXPECT_FALSE(consume(Option2(&us), {"a"})) << us;
-    EXPECT_FALSE(consume(Option2(&us), {"-1"})) << us;
+    EXPECT_FALSE(consume(Option2(&i), {"a"}));
+    EXPECT_FALSE(consume(Option2(&i), {"12345678901234567890"}));
+    EXPECT_FALSE(consume(Option2(&us), {"a"}));
+    EXPECT_FALSE(consume(Option2(&us), {"-1"}));
+    EXPECT_FALSE(consume(Option2(&b), {""}));
+    EXPECT_FALSE(consume(Option2(&b), {"01"}));
 }
 
 } // namespace ahoy

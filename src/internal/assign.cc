@@ -17,14 +17,41 @@ std::string ToLower(std::string value) {
     return value;
 }
 
+bool is_negative(const std::string& value) {
+    return value.size() > 0 && value[0] == '-';
+}
+
+template<typename T>
+bool assign(T func(const std::string&, std::size_t*, int), T* const pointer, const std::string& value) {
+    std::size_t leftover;
+    *pointer = func(value, &leftover, 10);
+    return leftover == value.size();
+}
+
+template<typename T>
+bool assign(T func(const std::string&, std::size_t*), T* const pointer, const std::string& value) {
+    std::size_t leftover;
+    *pointer = func(value, &leftover);
+    return leftover == value.size();
+}
+
+const std::set<std::string> kTrues = { "true", "t", "yes", "y", "on", "1" };
+const std::set<std::string> kFalses = { "false", "f", "no", "n", "off", "0" };
+
 } // namepspace
 
 namespace ahoy {
 namespace internal {
 
 bool AssignBool(bool * const pointer, const std::string& value) {
-    const std::set<std::string> trues = { "true", "t", "yes", "y", "on", "1" };
-    *pointer = trues.find(ToLower(value)) != trues.end();
+    const std::string lower_value = ToLower(value);
+    if (kTrues.find(lower_value) != kTrues.end()) {
+        *pointer = true;
+    } else if (kFalses.find(lower_value) != kFalses.end()) {
+        *pointer = false;
+    } else {
+        return false;
+    }
     return true;
 }
 
@@ -63,12 +90,13 @@ bool AssignUChar(unsigned char * const pointer, const bool value) {
 
 bool AssignShort(short * const pointer, const std::string& value) {
     try {
-        const int int_value = std::stoi(value);
-        if (int_value > SHRT_MAX || int_value < SHRT_MIN) {
-            return false;
+        int int_value;
+        if (assign(&std::stoi, &int_value, value) &&
+                int_value <= SHRT_MAX && int_value >= SHRT_MIN) {
+            *pointer = int_value;
+            return true;
         }
-        *pointer = int_value;
-        return true;
+        return false;
     } catch (std::invalid_argument) {
         return false;
     } catch (std::out_of_range) {
@@ -83,12 +111,12 @@ bool AssignShort(short * const pointer, const bool value) {
 
 bool AssignUShort(unsigned short * const pointer, const std::string& value) {
     try {
-        const unsigned long ulong_value = std::stoul(value);
-        if (ulong_value > USHRT_MAX) {
-            return false;
+        unsigned long ulong_value;
+        if (assign(&std::stoul, &ulong_value, value) && ulong_value <= USHRT_MAX) {
+            *pointer = ulong_value;
+            return true;
         }
-        *pointer = ulong_value;
-        return true;
+        return false;
     } catch (std::invalid_argument) {
         return false;
     } catch (std::out_of_range) {
@@ -103,8 +131,7 @@ bool AssignUShort(unsigned short * const pointer, const bool value) {
 
 bool AssignInt(int * const pointer, const std::string& value) {
     try {
-        *pointer = std::stoi(value);
-        return true;
+        return assign(&std::stoi, pointer, value);
     } catch (std::invalid_argument) {
         return false;
     } catch (std::out_of_range) {
@@ -119,12 +146,12 @@ bool AssignInt(int * const pointer, const bool value) {
 
 bool AssignUInt(uint * const pointer, const std::string& value) {
     try {
-        const unsigned long ulong_value = std::stoul(value);
-        if (ulong_value > UINT_MAX) {
-            return false;
+        unsigned long ulong_value;
+        if (assign(&std::stoul, &ulong_value, value) && ulong_value <= UINT_MAX) {
+            *pointer = ulong_value;
+            return true;
         }
-        *pointer = ulong_value;
-        return true;
+        return false;
     } catch (std::invalid_argument) {
         return false;
     } catch (std::out_of_range) {
@@ -139,8 +166,7 @@ bool AssignUInt(uint * const pointer, const bool value) {
 
 bool AssignLong(long * const pointer, const std::string& value) {
     try {
-        *pointer = std::stol(value);
-        return true;
+        return assign(&std::stol, pointer, value);
     } catch (std::invalid_argument) {
         return false;
     } catch (std::out_of_range) {
@@ -154,9 +180,12 @@ bool AssignLong(long * const pointer, const bool value) {
 }
 
 bool AssignULong(unsigned long * const pointer, const std::string& value) {
+    if (is_negative(value)) {
+        return false;
+    }
+
     try {
-        *pointer = std::stoul(value);
-        return true;
+        return assign(&std::stoul, pointer, value);
     } catch (std::invalid_argument) {
         return false;
     } catch (std::out_of_range) {
@@ -171,8 +200,7 @@ bool AssignULong(unsigned long * const pointer, const bool value) {
 
 bool AssignLongLong(long long * const pointer, const std::string& value) {
     try {
-        *pointer = std::stoll(value);
-        return true;
+        return assign(&std::stoll, pointer, value);
     } catch (std::invalid_argument) {
         return false;
     } catch (std::out_of_range) {
@@ -186,9 +214,12 @@ bool AssignLongLong(long long * const pointer, const bool value) {
 }
 
 bool AssignULongLong(unsigned long long * const pointer, const std::string& value) {
+    if (is_negative(value)) {
+        return false;
+    }
+
     try {
-        *pointer = std::stoull(value);
-        return true;
+        return assign(&std::stoull, pointer, value) && *pointer <= ULLONG_MAX;
     } catch (std::invalid_argument) {
         return false;
     } catch (std::out_of_range) {
@@ -203,7 +234,12 @@ bool AssignULongLong(unsigned long long * const pointer, const bool value) {
 
 bool AssignFloat(float * const pointer, const std::string& value) {
     try {
-        *pointer = std::stof(value);
+        // return assign(&std::stof, pointer, value);
+        std::size_t leftover(0);
+        *pointer = std::stof(value, &leftover);
+        if (leftover != value.size()) {
+            return false;
+        }
         return true;
     } catch (std::invalid_argument) {
         return false;
@@ -219,8 +255,7 @@ bool AssignFloat(float * const pointer, const bool value) {
 
 bool AssignDouble(double * const pointer, const std::string& value) {
     try {
-        *pointer = std::stod(value);
-        return true;
+        return assign(&std::stod, pointer, value);
     } catch (std::invalid_argument) {
         return false;
     } catch (std::out_of_range) {
@@ -235,8 +270,7 @@ bool AssignDouble(double * const pointer, const bool value) {
 
 bool AssignLongDouble(long double * const pointer, const std::string& value) {
     try {
-        *pointer = std::stold(value);
-        return true;
+        return assign(&std::stold, pointer, value);
     } catch (std::invalid_argument) {
         return false;
     } catch (std::out_of_range) {
