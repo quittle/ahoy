@@ -20,20 +20,20 @@ Parser::Parser() {}
 
 Parser::~Parser() {}
 
-Parser& Parser::withOptions(const std::vector<Option2>& options) {
-    current_options_ = options;
+Parser& Parser::withOptions(const std::vector<Parameter>& paramters) {
+    current_options_ = paramters;
     return *this;
 }
 
-Parser& Parser::then(const std::vector<Option2>& options) {
-    next_options_ = options;
+Parser& Parser::then(const std::vector<Parameter>& paramters) {
+    next_options_ = paramters;
     return *this;
 }
 
 bool Parser::Parse2(const int argc, char const * const argv[]) const {
     std::list<std::string> args(argv, argv + argc);
     std::string program_name;
-    Option2 root(&program_name);
+    Parameter root(&program_name);
     root.withOptions(current_options_).then(next_options_);
     const bool success = root.consume(args);
     return success && args.size() == 0;

@@ -45,15 +45,16 @@ class OptionChecker {
 // They return a reference to the original Parser for method chaining.
 #define _AHOY_PARSER_BUILD_FORMAL_PARAMETER(OptionClass, formal_parameter_value) \
     template<class ...Options> \
-    static void BuildFormalNamedParameter(internal::FormalParameter* fp, const OptionClass& option_value, \
+    static void BuildFormalNamedParameter(internal::FormalParameter* fp, \
+                                          const OptionClass& option_value, \
                                           Options... options) { \
         fp->formal_parameter_value(option_value.get()); \
         BuildFormalNamedParameter(fp, options...); \
     }
 
-#define _AHOY_OPTION2_CTR(PointerType, InternalType) \
+#define _AHOY_PARAMETER_CTR(PointerType, InternalType) \
     template<class ...Options> \
-    explicit Option2(PointerType* storage, Options... options) { \
+    explicit Parameter(PointerType* storage, Options... options) { \
         OptionChecker<Options...>{}; \
         fp_.type(InternalType); \
         BuildFormalNamedParameter(&fp_, options...); \
@@ -62,44 +63,44 @@ class OptionChecker {
 
 namespace ahoy {
 
-class Option2 {
+class Parameter {
    public:
-    _AHOY_OPTION2_CTR(bool, internal::Type::BOOL);
-    _AHOY_OPTION2_CTR(char, internal::Type::CHAR);
-    _AHOY_OPTION2_CTR(unsigned char, internal::Type::U_CHAR);
-    _AHOY_OPTION2_CTR(short, internal::Type::SHORT);
-    _AHOY_OPTION2_CTR(unsigned short, internal::Type::U_SHORT);
-    _AHOY_OPTION2_CTR(int, internal::Type::INT);
-    _AHOY_OPTION2_CTR(unsigned int, internal::Type::U_INT);
-    _AHOY_OPTION2_CTR(long, internal::Type::LONG);
-    _AHOY_OPTION2_CTR(unsigned long, internal::Type::U_LONG);
-    _AHOY_OPTION2_CTR(long long, internal::Type::LONG_LONG);
-    _AHOY_OPTION2_CTR(unsigned long long, internal::Type::U_LONG_LONG);
-    _AHOY_OPTION2_CTR(float, internal::Type::FLOAT);
-    _AHOY_OPTION2_CTR(double, internal::Type::DOUBLE);
-    _AHOY_OPTION2_CTR(long double, internal::Type::LONG_DOUBLE);
-    _AHOY_OPTION2_CTR(std::string, internal::Type::STRING);
+    _AHOY_PARAMETER_CTR(bool, internal::Type::BOOL);
+    _AHOY_PARAMETER_CTR(char, internal::Type::CHAR);
+    _AHOY_PARAMETER_CTR(unsigned char, internal::Type::U_CHAR);
+    _AHOY_PARAMETER_CTR(short, internal::Type::SHORT);
+    _AHOY_PARAMETER_CTR(unsigned short, internal::Type::U_SHORT);
+    _AHOY_PARAMETER_CTR(int, internal::Type::INT);
+    _AHOY_PARAMETER_CTR(unsigned int, internal::Type::U_INT);
+    _AHOY_PARAMETER_CTR(long, internal::Type::LONG);
+    _AHOY_PARAMETER_CTR(unsigned long, internal::Type::U_LONG);
+    _AHOY_PARAMETER_CTR(long long, internal::Type::LONG_LONG);
+    _AHOY_PARAMETER_CTR(unsigned long long, internal::Type::U_LONG_LONG);
+    _AHOY_PARAMETER_CTR(float, internal::Type::FLOAT);
+    _AHOY_PARAMETER_CTR(double, internal::Type::DOUBLE);
+    _AHOY_PARAMETER_CTR(long double, internal::Type::LONG_DOUBLE);
+    _AHOY_PARAMETER_CTR(std::string, internal::Type::STRING);
 
-    virtual ~Option2() {}
+    virtual ~Parameter() {}
 
-    Option2& withOptions(const std::vector<Option2>& options) {
-        current_options_ = options;
+    Parameter& withOptions(const std::vector<Parameter>& parameters) {
+        current_options_ = parameters;
         return *this;
     }
 
-    template <typename... O>
-    Option2& withOptions(O&&... options) {
-        return withOptions({ std::forward<Option2>(options)... });
+    template <typename... P>
+    Parameter& withOptions(P&&... parameters) {
+        return withOptions({ std::forward<Parameter>(parameters)... });
     }
 
-    Option2& then(const std::vector<Option2>& options) {
-        next_options_ = options;
+    Parameter& then(const std::vector<Parameter>& parameters) {
+        next_options_ = parameters;
         return *this;
     }
 
-    template <typename... O>
-    Option2& then(O&&... options) {
-        return then({ std::forward<Option2>(options)... });
+    template <typename... P>
+    Parameter& then(P&&... parameters) {
+        return then({ std::forward<Parameter>(parameters)... });
     }
 
     bool consume(std::list<std::string>& args) const {
@@ -135,16 +136,16 @@ class Option2 {
         }
 
         if (consumed) {
-            for (const Option2& option : current_options_) {
-                option.consume(args);
+            for (const Parameter& parameter : current_options_) {
+                parameter.consume(args);
             }
 
             if (next_options_.size() == 0) {
                 return true;
             }
 
-            for (const Option2& option : next_options_) {
-                if (option.consume(args)) {
+            for (const Parameter& parameter : next_options_) {
+                if (parameter.consume(args)) {
                     return true;
                 }
             }
@@ -163,10 +164,10 @@ class Option2 {
     static void BuildFormalNamedParameter(internal::FormalParameter*) {}
 
     void* storage_;
-    ::ahoy::internal::FormalParameter fp_;
+    internal::FormalParameter fp_;
 
-    std::vector<Option2> current_options_;
-    std::vector<Option2> next_options_;
+    std::vector<Parameter> current_options_;
+    std::vector<Parameter> next_options_;
 };
 
 } // namespace ahoy

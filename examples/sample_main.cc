@@ -17,11 +17,11 @@ void other_main(const int argc, char const * const * const argv) {
 
     ahoy::Parser parser = ahoy::Parser()
         .withOptions(
-            ahoy::Option2(&file_name, ahoy::ShortForms({"a"}), ahoy::Description("this is a description"), ahoy::Name("name")),
-            ahoy::Option2(&file_name)
+            ahoy::Parameter(&file_name, ahoy::ShortForms({"a"}), ahoy::Description("this is a description"), ahoy::Name("name")),
+            ahoy::Parameter(&file_name)
         )
         .then(
-            ahoy::Option2(&passed)
+            ahoy::Parameter(&passed)
         );
     const bool success = parser.Parse2(argc, argv);
 

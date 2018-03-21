@@ -88,14 +88,14 @@ class Parser {
     Parser();
     virtual ~Parser();
 
-    template <typename... O>
-    Parser& withOptions(O&&... options) {
-        return withOptions({ std::forward<Option2>(options)... });
+    template <typename... P>
+    Parser& withOptions(P&&... parameters) {
+        return withOptions({ std::forward<Parameter>(parameters)... });
     }
 
-    template <typename... O>
-    Parser& then(O&&... options) {
-        return then({ std::forward<Option2>(options)... });
+    template <typename... P>
+    Parser& then(P&&... parameters) {
+        return then({ std::forward<Parameter>(parameters)... });
     }
 
     // These macros generate methods in the forms
@@ -143,8 +143,8 @@ class Parser {
     bool Parse2(const int argc, char const * const argv[]) const;
 
   private:
-    Parser& withOptions(const std::vector<Option2>& options);
-    Parser& then(const std::vector<Option2>& options);
+    Parser& withOptions(const std::vector<Parameter>& paramters);
+    Parser& then(const std::vector<Parameter>& paramters);
 
     // Builds formal parameters from vararg options
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(Name, name)
@@ -160,8 +160,8 @@ class Parser {
     void BuildFormalNamedParameter(internal::FormalParameter* /* fp */) {}
     void BuildFormalPositionalParameter(internal::FormalParameter* /* fp */) {}
 
-    std::vector<Option2> current_options_;
-    std::vector<Option2> next_options_;
+    std::vector<Parameter> current_options_;
+    std::vector<Parameter> next_options_;
 
     // All the named pointers, including flags
     std::vector<void*> named_pointers_list_;

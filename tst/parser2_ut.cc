@@ -41,7 +41,7 @@ TEST(Parser2, Empty) {
 TEST(Parser2, SingleOption) {
     std::string param;
 
-    const Parser p = Parser().withOptions(Option2(&param));
+    const Parser p = Parser().withOptions(Parameter(&param));
     EXPECT_TRUE(parse(p, {}));
     EXPECT_TRUE(parse(p, { kValue }));
     EXPECT_FALSE(parse(p, { kValue, kValue }));
@@ -51,7 +51,7 @@ TEST(Parser2, SingleOption) {
 TEST(Parser2, SingleNext) {
     std::string param;
 
-    const Parser p = Parser().then(Option2(&param));
+    const Parser p = Parser().then(Parameter(&param));
     EXPECT_FALSE(parse(p, {}));
     EXPECT_TRUE(parse(p, { kValue }));
     EXPECT_FALSE(parse(p, { kValue, kValue }));
@@ -62,7 +62,7 @@ TEST(Parser2, OptionAndNext) {
     std::string option;
     std::string then;
 
-    const Parser p = Parser().withOptions(Option2(&option)).then(Option2(&then));
+    const Parser p = Parser().withOptions(Parameter(&option)).then(Parameter(&then));
     EXPECT_FALSE(parse(p, {}));
     EXPECT_FALSE(parse(p, { kValue }));
     EXPECT_TRUE(parse(p, { kValue, kValue2 }));

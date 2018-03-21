@@ -13,8 +13,8 @@ namespace {
 const char kValue[] = "value";
 const char kValue2[] = "value 2";
 
-bool consume(const ahoy::Option2& o, std::list<std::string> args) {
-    return o.consume(args);
+bool consume(const ahoy::Parameter& parameter, std::list<std::string> args) {
+    return parameter.consume(args);
 }
 
 } // namespace
@@ -24,10 +24,10 @@ namespace ahoy {
 #define TYPE_TEST(Type) \
     do { \
         Type* t(nullptr); \
-        Option2 o(t); \
+        Parameter p(t); \
     } while(false)
 
-TEST(Option2, Types) {
+TEST(Parameter, Types) {
     TYPE_TEST(bool);
 
     TYPE_TEST(char);
@@ -52,96 +52,96 @@ TEST(Option2, Types) {
     TYPE_TEST(std::string);
 }
 
-TEST(Option2, Empty) {
-    bool* p(nullptr);
-    const Option2 o(p);
+TEST(Parameter, Empty) {
+    bool* ptr(nullptr);
+    const Parameter p(ptr);
 }
 
-TEST(Option2, Chaining) {
-    bool* p(nullptr);
+TEST(Parameter, Chaining) {
+    bool* ptr(nullptr);
 
-    Option2 o(p);
-    Option2(p)
-        .then(o.then(o)
-               .withOptions(o, o)
+    Parameter p(ptr);
+    Parameter(ptr)
+        .then(p.then(p)
+               .withOptions(p, p)
                .withOptions())
         .then()
         .withOptions(
-            o.withOptions(Option2(p)),
-            o.then(o));
+            p.withOptions(Parameter(ptr)),
+            p.then(p));
 }
 
-TEST(Option2, ShortForms) {
+TEST(Parameter, ShortForms) {
     std::string value;
 
-    const Option2 o(&value, ShortForms({"v"}));
+    const Parameter p(&value, ShortForms({"v"}));
 
-    EXPECT_FALSE(consume(o, {}));
+    EXPECT_FALSE(consume(p, {}));
     EXPECT_EQ("", value);
 
-    EXPECT_FALSE(consume(o, { "-v" }));
+    EXPECT_FALSE(consume(p, { "-v" }));
     EXPECT_EQ("", value);
 
-    EXPECT_FALSE(consume(o, { "-o" }));
+    EXPECT_FALSE(consume(p, { "-o" }));
     EXPECT_EQ("", value);
 
-    EXPECT_TRUE(consume(o, { "-v", kValue }));
+    EXPECT_TRUE(consume(p, { "-v", kValue }));
     EXPECT_EQ(kValue, value);
 }
 
-TEST(Option2, LongForms) {
+TEST(Parameter, LongForms) {
     std::string value;
 
-    const Option2 o(&value, LongForms({"v"}));
+    const Parameter p(&value, LongForms({"v"}));
 
-    EXPECT_FALSE(consume(o, {}));
+    EXPECT_FALSE(consume(p, {}));
     EXPECT_EQ("", value);
 
-    EXPECT_FALSE(consume(o, { "--v" }));
+    EXPECT_FALSE(consume(p, { "--v" }));
     EXPECT_EQ("", value);
 
-    EXPECT_FALSE(consume(o, { "--o" }));
+    EXPECT_FALSE(consume(p, { "--o" }));
     EXPECT_EQ("", value);
 
-    EXPECT_TRUE(consume(o, { "--v", kValue }));
+    EXPECT_TRUE(consume(p, { "--v", kValue }));
     EXPECT_EQ(kValue, value);
 }
 
-TEST(Option2, Flag) {
+TEST(Parameter, Flag) {
     std::string value;
 
-    const Option2 o(&value, Flag());
+    const Parameter p(&value, Flag());
 
-    EXPECT_FALSE(consume(o, {}));
+    EXPECT_FALSE(consume(p, {}));
     EXPECT_EQ("", value);
 
-    EXPECT_TRUE(consume(o, { kValue }));
+    EXPECT_TRUE(consume(p, { kValue }));
     EXPECT_EQ("true", value);
 }
 
-TEST(Option2, Literal) {
+TEST(Parameter, Literal) {
     std::string value;
 
-    const Option2 o(&value);
+    const Parameter p(&value);
 
-    EXPECT_FALSE(consume(o, {}));
+    EXPECT_FALSE(consume(p, {}));
     EXPECT_EQ("", value);
 
-    EXPECT_TRUE(consume(o, { kValue }));
+    EXPECT_TRUE(consume(p, { kValue }));
     EXPECT_EQ(kValue, value);
 }
 
-TEST(Option2, TypeMismatch) {
+TEST(Parameter, TypeMismatch) {
     int i;
     unsigned short us;
     bool b;
 
-    EXPECT_FALSE(consume(Option2(&i), {"a"}));
-    EXPECT_FALSE(consume(Option2(&i), {"12345678901234567890"}));
-    EXPECT_FALSE(consume(Option2(&us), {"a"}));
-    EXPECT_FALSE(consume(Option2(&us), {"-1"}));
-    EXPECT_FALSE(consume(Option2(&b), {""}));
-    EXPECT_FALSE(consume(Option2(&b), {"01"}));
+    EXPECT_FALSE(consume(Parameter(&i), {"a"}));
+    EXPECT_FALSE(consume(Parameter(&i), {"12345678901234567890"}));
+    EXPECT_FALSE(consume(Parameter(&us), {"a"}));
+    EXPECT_FALSE(consume(Parameter(&us), {"-1"}));
+    EXPECT_FALSE(consume(Parameter(&b), {""}));
+    EXPECT_FALSE(consume(Parameter(&b), {"01"}));
 }
 
 } // namespace ahoy
