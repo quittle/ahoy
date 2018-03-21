@@ -17,13 +17,16 @@ std::string ToLower(std::string value) {
     return value;
 }
 
+// Checks if a string looks like it could be a negative number
 bool is_negative(const std::string& value) {
     return value.size() > 0 && value[0] == '-';
 }
 
 template<typename T>
-bool assign(T func(const std::string&, std::size_t*, int), T* const pointer, const std::string& value) {
+bool assign(T func(const std::string&, std::size_t*, int), T* const pointer,
+        const std::string& value) {
     std::size_t leftover;
+    // std::sto*** methods can parse strings partially, but this requires complete parsing
     *pointer = func(value, &leftover, 10);
     return leftover == value.size();
 }
@@ -31,6 +34,7 @@ bool assign(T func(const std::string&, std::size_t*, int), T* const pointer, con
 template<typename T>
 bool assign(T func(const std::string&, std::size_t*), T* const pointer, const std::string& value) {
     std::size_t leftover;
+    // std::sto*** methods can parse strings partially, but this requires complete parsing
     *pointer = func(value, &leftover);
     return leftover == value.size();
 }

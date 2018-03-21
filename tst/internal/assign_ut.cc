@@ -5,6 +5,9 @@
 
 #include <gtest/gtest.h>
 
+// The following are helper macros to enable more consistent testing of assignment functions while
+// preserving line numbers for failures.
+
 #define EXPECT_ASSIGN_FAILURE(assignmentFunc, value) \
     EXPECT_FALSE(assignmentFunc(&value, std::string())); \
     EXPECT_FALSE(assignmentFunc(&value, std::string("  "))); \
