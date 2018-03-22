@@ -1,18 +1,5 @@
-# Copyright (c) 2016 Dustin Doloff
+# Copyright (c) 2016, 2018 Dustin Doloff
 # Licensed under Apache License v2.0
-
-# Enable warnings
-build --cxxopt -Wall
-build --cxxopt -Werror
-build --cxxopt -Wextra
-build --cxxopt -Woverloaded-virtual
-build --cxxopt -Wpedantic
-build --cxxopt -Wsequence-point
-build --cxxopt -Wunused
-build --cxxopt -pedantic-errors
-
-# Disable warnings
-build --cxxopt -Wno-unused-function
 
 # Add test configuration
 test --test_output all

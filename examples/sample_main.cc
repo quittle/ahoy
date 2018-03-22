@@ -20,7 +20,7 @@ void other_main(const int argc, char const * const * const argv) {
         .then(
             ahoy::Parameter(&passed)
         );
-    const bool success = parser.Parse2(argc, argv);
+    const bool success = parser.Parse(argc, argv);
 
     std::cout << "OTHER MAIN >>>>>>" << std::endl;
     std::cout << "Success: " << (success ? "true" : "false") << std::endl;
@@ -42,20 +42,20 @@ int main(const int argc, char const * const * const argv) {
 
     // Create parser and set parameters
     ahoy::Parser parser;
-    parser.AddNamedParam(&iterations,
-            ahoy::ShortForms({"i"}), ahoy::LongForms({"iterations"}),
-            ahoy::Name("Iterations"), ahoy::Description("Number of times to run"));
-    parser.AddNamedParam(&verbose,
-            ahoy::ShortForms({"v"}), ahoy::LongForms({"verbose"}),
-            ahoy::Name("Verbose"), ahoy::Description("Enable verbose logging"),
-            ahoy::Flag());
-    parser.AddNamedParam(&help,
-            ahoy::ShortForms({"h"}), ahoy::LongForms({"help"}),
-            ahoy::Name("Help"), ahoy::Description("Displays help message"),
-            ahoy::Flag());
-    parser.AddPositionalParam(&file_name,
-            ahoy::Name("File"), ahoy::Description("The file to process"),
-            ahoy::Required());
+    // parser.AddNamedParam(&iterations,
+    //         ahoy::ShortForms({"i"}), ahoy::LongForms({"iterations"}),
+    //         ahoy::Name("Iterations"), ahoy::Description("Number of times to run"));
+    // parser.AddNamedParam(&verbose,
+    //         ahoy::ShortForms({"v"}), ahoy::LongForms({"verbose"}),
+    //         ahoy::Name("Verbose"), ahoy::Description("Enable verbose logging"),
+    //         ahoy::Flag());
+    // parser.AddNamedParam(&help,
+    //         ahoy::ShortForms({"h"}), ahoy::LongForms({"help"}),
+    //         ahoy::Name("Help"), ahoy::Description("Displays help message"),
+    //         ahoy::Flag());
+    // parser.AddPositionalParam(&file_name,
+    //         ahoy::Name("File"), ahoy::Description("The file to process"),
+    //         ahoy::Required());
 
     // Current limitation of parser does not allow branching so missing, required parameters will
     // fail the parsing even if the help parametrer is passed in

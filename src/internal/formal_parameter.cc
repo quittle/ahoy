@@ -6,7 +6,7 @@
 namespace ahoy {
 namespace internal {
 
-FormalParameter::FormalParameter() :  required_(false), flag_(false), type_(Type::INVALID) {}
+FormalParameter::FormalParameter() :  name_(), description_(), forms_(), marker_(), required_(false), flag_(false), type_(Type::INVALID) {}
 FormalParameter::~FormalParameter() {}
 
 const std::string& FormalParameter::name() const {

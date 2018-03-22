@@ -16,7 +16,7 @@
 
 namespace ahoy {
 
-Parser::Parser() {}
+Parser::Parser() : current_options_(), next_options_() {}
 
 Parser::~Parser() {}
 
@@ -30,7 +30,7 @@ Parser& Parser::then(const std::vector<Parameter>& paramters) {
     return *this;
 }
 
-bool Parser::Parse2(const int argc, char const * const argv[]) const {
+bool Parser::Parse(const int argc, char const * const argv[]) const {
     std::list<std::string> args(argv, argv + argc);
     std::string program_name;
     Parameter root(&program_name);
