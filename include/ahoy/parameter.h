@@ -17,14 +17,12 @@
 
 #define _AHOY_PARAMETER_STATIC_ASSERT_NOT_BOTH(a, b) \
     static_assert(!ahoy::internal::does_contain_type_2<b, a, Options...>::value, \
-                  "Parameter may not be both an #a and #b.")
+                  "Parameter may not be both " #a " and " #b ".")
 
 // Validates the varargs of options
 template <typename... Options>
 class OptionChecker {
     _AHOY_PARAMETER_STATIC_ASSERT_NOT_BOTH(ahoy::Flag, ahoy::Required);
-    _AHOY_PARAMETER_STATIC_ASSERT_NOT_BOTH(ahoy::ShortForms, ahoy::Flag);
-    _AHOY_PARAMETER_STATIC_ASSERT_NOT_BOTH(ahoy::LongForms, ahoy::Flag);
 };
 
 // These macros generate methods in the form

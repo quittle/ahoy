@@ -23,10 +23,14 @@ class Parser {
     Parser();
     virtual ~Parser();
 
+    Parser& withOptions(const std::vector<Parameter>& parameters);
+
     template <typename... P>
     Parser& withOptions(P&&... parameters) {
         return withOptions({ std::forward<Parameter>(parameters)... });
     }
+
+    Parser& then(const std::vector<Parameter>& parameters);
 
     template <typename... P>
     Parser& then(P&&... parameters) {
@@ -40,9 +44,6 @@ class Parser {
     bool Parse(const int argc, char const * const argv[]) const;
 
   private:
-    Parser& withOptions(const std::vector<Parameter>& paramters);
-    Parser& then(const std::vector<Parameter>& paramters);
-
     std::vector<Parameter> current_options_;
     std::vector<Parameter> next_options_;
 };

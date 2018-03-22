@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Dustin Doloff
+// Copyright (c) 2016, 2018 Dustin Doloff
 // Licensed under Apache License v2.0
 
 // Example program
@@ -8,32 +8,7 @@
 
 #include <ahoy/ahoy_all.h>
 
-void other_main(const int argc, char const * const * const argv) {
-    std::string file_name;
-    bool passed(false);
-
-    ahoy::Parser parser = ahoy::Parser()
-        .withOptions(
-            ahoy::Parameter(&file_name, ahoy::ShortForms({"a"}), ahoy::Description("this is a description"), ahoy::Name("name")),
-            ahoy::Parameter(&file_name)
-        )
-        .then(
-            ahoy::Parameter(&passed)
-        );
-    const bool success = parser.Parse(argc, argv);
-
-    std::cout << "OTHER MAIN >>>>>>" << std::endl;
-    std::cout << "Success: " << (success ? "true" : "false") << std::endl;
-    std::cout << "file_name: " << file_name << std::endl;
-    std::cout << "passed: " << passed << std::endl;
-    std::cout << "<<<<<< OTHER MAIN" << std::endl;
-}
-
 int main(const int argc, char const * const * const argv) {
-    // std::set<std::string> vals = { "-a" };
-    // std::cout << (vals.count("-" + std::string("a")) ? "t" : "f");
-    // return 0;
-    other_main(argc, argv);
     // Set default values for parameters
     int iterations = 3;
     bool verbose = false;
@@ -41,34 +16,42 @@ int main(const int argc, char const * const * const argv) {
     std::string file_name;
 
     // Create parser and set parameters
-    ahoy::Parser parser;
-    // parser.AddNamedParam(&iterations,
-    //         ahoy::ShortForms({"i"}), ahoy::LongForms({"iterations"}),
-    //         ahoy::Name("Iterations"), ahoy::Description("Number of times to run"));
-    // parser.AddNamedParam(&verbose,
-    //         ahoy::ShortForms({"v"}), ahoy::LongForms({"verbose"}),
-    //         ahoy::Name("Verbose"), ahoy::Description("Enable verbose logging"),
-    //         ahoy::Flag());
-    // parser.AddNamedParam(&help,
-    //         ahoy::ShortForms({"h"}), ahoy::LongForms({"help"}),
-    //         ahoy::Name("Help"), ahoy::Description("Displays help message"),
-    //         ahoy::Flag());
-    // parser.AddPositionalParam(&file_name,
-    //         ahoy::Name("File"), ahoy::Description("The file to process"),
-    //         ahoy::Required());
+    const ahoy::Parser parser = ahoy::Parser()
+        .withOptions(
+            ahoy::Parameter(&iterations,
+                    ahoy::ShortForms({"i"}),
+                    ahoy::LongForms({"iterations"}),
+                    ahoy::Name("Iterations"),
+                    ahoy::Description("Number of times to run")),
+            ahoy::Parameter(&help,
+                    ahoy::ShortForms({"h"}),
+                    ahoy::LongForms({"help"}),
+                    ahoy::Name("Help"),
+                    ahoy::Description("Displays help message"),
+                    ahoy::Flag()),
+            ahoy::Parameter(&verbose,
+                    ahoy::ShortForms({"v"}),
+                    ahoy::LongForms({"verbose"}),
+                    ahoy::Name("Verbose"),
+                    ahoy::Description("Enable verbose logging"),
+                    ahoy::Flag())
+        )
+        .then(
+            ahoy::Parameter(&file_name,
+                    ahoy::Name("File"),
+                    ahoy::Description("The file to process"))
+        );
 
-    // Current limitation of parser does not allow branching so missing, required parameters will
-    // fail the parsing even if the help parametrer is passed in
-    const bool parse_success = true;//parser.Parse(argc, argv);
+    const bool parse_success = parser.Parse(argc, argv);
+
+    if (!parse_success) {
+        std::cerr << "Invalid arguments passed in" << std::endl;
+        return 1;
+    }
 
     if (help) {
         std::cout << "Displaying help message" << std::endl;
         return 0;
-    }
-
-    if (!parse_success) {
-        std::cerr << "Unable to parse arguments" << std::endl;
-        return 1;
     }
 
     if (verbose) {
