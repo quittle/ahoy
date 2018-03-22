@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Dustin Doloff
+// Copyright (c) 2016 Dustin Toff
 // Licensed under Apache License v2.0
 
 #include "ahoy/parser.h"

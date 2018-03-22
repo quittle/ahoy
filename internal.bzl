@@ -1,4 +1,4 @@
-# Copyright (c) 2018 Dustin Doloff
+# Copyright (c) 2018 Dustin Toff
 # Licensed under Apache License v2.0
 
 CC_WARNINGS = [

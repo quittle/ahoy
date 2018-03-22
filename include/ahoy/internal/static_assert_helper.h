@@ -1,4 +1,4 @@
-// Copyright (c) 2016, 2018 Dustin Doloff
+// Copyright (c) 2016, 2018 Dustin Toff
 // Licensed under apache License v2.0
 
 #ifndef AHOY_AHOY_INTERNAL_STATIC_ASSERT_HELPER_H

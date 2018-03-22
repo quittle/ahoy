@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Dustin Doloff
+// Copyright (c) 2016 Dustin Toff
 // Licensed under Apache License v2.0
 
 #ifndef AHOY_AHOY_PARSER_H
