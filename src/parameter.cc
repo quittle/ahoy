@@ -3,6 +3,18 @@
 
 #include "ahoy/parameter.h"
 
+namespace {
+
+// Gets the nth element for a list
+template<typename T>
+const T& get_nth(const std::list<T> list, const std::size_t index) {
+    auto it = list.begin();
+    std::advance(it, index);
+    return *it;
+}
+
+} // namespace
+
 namespace ahoy {
 
 Parameter::~Parameter() {}
@@ -31,19 +43,20 @@ bool Parameter::consume(std::list<std::string>& args) const {
         }
         args.pop_front();
         consumed = true;
-    } else if (args.size() >= 2) {
-        const std::string arg = args.front();
+    } else {
+        const std::string& arg = args.front();
         if (fp_.forms().count(arg)) {
-            args.pop_front();
             if (fp_.flag()) {
                 if (!Assign(storage_, fp_.type(), true)) {
                     return false;
                 }
+                args.pop_front();
                 consumed = true;
-            } else {
-                if (!Assign(storage_, fp_.type(), args.front())) {
+            } else if (args.size() >= 2) {
+                if (!Assign(storage_, fp_.type(), get_nth(args, 1))) {
                     return false;
                 }
+                args.pop_front();
                 args.pop_front();
                 consumed = true;
             }

@@ -10,9 +10,9 @@
 
 int main(const int argc, char const * const * const argv) {
     // Set default values for parameters
-    int iterations = 3;
-    bool verbose = false;
-    bool help = false;
+    int iterations(3);
+    bool verbose(false);
+    bool help(false);
     std::string file_name;
 
     // Create parser and set parameters
@@ -23,12 +23,6 @@ int main(const int argc, char const * const * const argv) {
                     ahoy::LongForms({"iterations"}),
                     ahoy::Name("Iterations"),
                     ahoy::Description("Number of times to run")),
-            ahoy::Parameter(&help,
-                    ahoy::ShortForms({"h"}),
-                    ahoy::LongForms({"help"}),
-                    ahoy::Name("Help"),
-                    ahoy::Description("Displays help message"),
-                    ahoy::Flag()),
             ahoy::Parameter(&verbose,
                     ahoy::ShortForms({"v"}),
                     ahoy::LongForms({"verbose"}),
@@ -37,6 +31,12 @@ int main(const int argc, char const * const * const argv) {
                     ahoy::Flag())
         )
         .then(
+            ahoy::Parameter(&help,
+                    ahoy::ShortForms({"h"}),
+                    ahoy::LongForms({"help"}),
+                    ahoy::Name("Help"),
+                    ahoy::Description("Displays help message"),
+                    ahoy::Flag()),
             ahoy::Parameter(&file_name,
                     ahoy::Name("File"),
                     ahoy::Description("The file to process"))
