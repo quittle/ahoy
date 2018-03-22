@@ -33,6 +33,10 @@ Parameter& Parameter::then(const std::vector<Parameter>& parameters) {
 bool Parameter::consume(std::list<std::string>& args) const {
     bool consumed(false);
 
+    if (args.size() == 0) {
+        return false;
+    }
+
     if (fp_.is_positional() && args.size() >= 1) {
         if (fp_.flag()) {
             if (!Assign(storage_, fp_.type(), true)) {

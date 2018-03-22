@@ -70,4 +70,12 @@ TEST(Parser, OptionAndNext) {
     EXPECT_EQ(kValue2, then);
 }
 
+TEST(Parser, ProgramName) {
+    std::string program_name;
+
+    char const * const args[] = { kProgram };
+    EXPECT_TRUE(Parser().Parse(1, args, &program_name));
+    EXPECT_EQ(kProgram, program_name);
+}
+
 } // namespace ahoy

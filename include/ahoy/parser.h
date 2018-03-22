@@ -41,7 +41,7 @@ class Parser {
     // via the add param methods. Returns true if the arguments were parsed successfully and false
     // if some constraints could not be met, e.g. missing required parameters or parameters that are
     // unsigned but are passed a negative number
-    bool Parse(const int argc, char const * const argv[]) const;
+    bool Parse(const int argc, char const * const argv[], std::string* program_name = nullptr) const;
 
   private:
     std::vector<Parameter> current_options_;

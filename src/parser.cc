@@ -30,10 +30,16 @@ Parser& Parser::then(const std::vector<Parameter>& paramters) {
     return *this;
 }
 
-bool Parser::Parse(const int argc, char const * const argv[]) const {
+bool Parser::Parse(const int argc, char const * const argv[], std::string* program_name) const {
+    // Alternate holder to store the program name
+    std::string* ptr = program_name;
+    std::string alternate;
+    if (ptr == nullptr) {
+        ptr = &alternate;
+    }
+
     std::list<std::string> args(argv, argv + argc);
-    std::string program_name;
-    Parameter root(&program_name);
+    Parameter root(ptr);
     root.withOptions(current_options_).then(next_options_);
     const bool success = root.consume(args);
     return success && args.size() == 0;
