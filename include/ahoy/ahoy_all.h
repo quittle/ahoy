@@ -3,7 +3,6 @@
 
 // Include this file to include all public-facing APIs and classes
 
-#include <ahoy/newline.h>
 #include <ahoy/options.h>
 #include <ahoy/parameter.h>
 #include <ahoy/parser.h>

@@ -8,7 +8,6 @@
 #include <string>
 #include <vector>
 
-#include "ahoy/newline.h"
 #include "ahoy/options.h"
 #include "ahoy/parameter.h"
 #include "ahoy/internal/formal_parameter.h"
