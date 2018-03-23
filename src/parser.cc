@@ -42,4 +42,12 @@ bool Parser::Parse(const int argc, char const * const argv[], std::string* progr
     return success && args.size() == 0;
 }
 
+const std::vector<Parameter>& Parser::current_options() const {
+    return current_options_;
+}
+
+const std::vector<Parameter>& Parser::next_options() const {
+    return next_options_;
+}
+
 } // namespace ahoy

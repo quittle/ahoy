@@ -78,4 +78,17 @@ TEST(Parser, ProgramName) {
     EXPECT_EQ(kProgram, program_name);
 }
 
+TEST(Parser, GetCurrentOptions) {
+    Parser parser;
+    ASSERT_EQ(0, parser.current_options().size());
+    parser.withOptions({});
+    ASSERT_EQ(0, parser.current_options().size());
+    Parameter parameter((bool*) nullptr);
+    parser.withOptions(parameter);
+    const std::vector<Parameter>& parameters = parser.current_options();
+    ASSERT_EQ(1, parameters.size());
+    ASSERT_EQ(parameter, parameters[0]);
+    ASSERT_EQ(std::vector<Parameter>({parameter}), parser.current_options());
+}
+
 } // namespace ahoy

@@ -77,5 +77,18 @@ void FormalParameter::type(const Type type) {
     type_ = type;
 }
 
+bool FormalParameter::operator ==(const FormalParameter& other) const {
+    return name_ == other.name_ &&
+            description_ == other.description_ &&
+            forms_ == other.forms_ &&
+            marker_ == other.marker_ &&
+            required_ == other.required_ &&
+            flag_ == other.flag_ &&
+            type_ == other.type_;
+}
+bool FormalParameter::operator !=(const FormalParameter& other) const {
+    return !(*this == other);
+}
+
 } // namespace internal
 } // namespace ahoy

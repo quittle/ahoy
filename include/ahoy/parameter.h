@@ -101,6 +101,15 @@ class Parameter {
     // succesful. If unsuccessful, the value stored by the pointer passed in may be modified.
     bool consume(std::list<std::string>& args) const;
 
+    // Gets a reference to the current options vector
+    const std::vector<Parameter>& current_options() const;
+
+    // Gets a reference to the next options vector
+    const std::vector<Parameter>& next_options() const;
+
+    bool operator ==(const Parameter& other) const;
+    bool operator !=(const Parameter& other) const;
+
   private:
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::LongForms, long_forms)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::ShortForms, short_forms)

@@ -144,4 +144,27 @@ TEST(Parameter, TypeMismatch) {
     EXPECT_FALSE(consume(Parameter(&b), {"01"}));
 }
 
+TEST(Parameter, Equality) {
+    char c, c2;
+    Parameter p1(&c), p2(&c), p3(&c);
+    ASSERT_EQ(p1, p1);
+    ASSERT_EQ(p1, p2);
+    ASSERT_NE(p1, Parameter(&c2));
+
+    p1.withOptions({});
+    ASSERT_EQ(p1, p2);
+
+    p1.withOptions(p3);
+    ASSERT_NE(p1, p2);
+
+    p2.withOptions(p3);
+    ASSERT_EQ(p1, p2);
+
+    p1.then(p3, p3);
+    ASSERT_NE(p1, p2);
+
+    p2.then(p3, p3);
+    ASSERT_EQ(p1, p2);
+}
+
 } // namespace ahoy

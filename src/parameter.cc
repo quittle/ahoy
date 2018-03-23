@@ -86,6 +86,25 @@ bool Parameter::consume(std::list<std::string>& args) const {
     return false;
 }
 
+const std::vector<Parameter>& Parameter::current_options() const {
+    return current_options_;
+}
+
+const std::vector<Parameter>& Parameter::next_options() const {
+    return next_options_;
+}
+
+bool Parameter::operator ==(const Parameter& other) const {
+    return storage_ == other.storage_ &&
+            fp_ == other.fp_ &&
+            current_options_ == other.current_options_ &&
+            next_options_ == other.next_options_;
+}
+
+bool Parameter::operator !=(const Parameter& other) const {
+    return !(*this == other);
+}
+
 void Parameter::BuildFormalNamedParameter(internal::FormalParameter*) {}
 
 } // namespace ahoy

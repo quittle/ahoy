@@ -88,5 +88,39 @@ TEST(FormalParameter, GetSet) {
     }
 }
 
+TEST(FormalParameter, Equality) {
+    FormalParameter fp1, fp2;
+    ASSERT_EQ(fp1, fp1);
+    ASSERT_EQ(fp1, fp2);
+
+    fp1.name("name");
+    ASSERT_NE(fp1, fp2);
+    fp2.name("name");
+    ASSERT_EQ(fp1, fp2);
+
+    fp1.description("desc");
+    fp1.short_forms({std::string("short forms")});
+    fp1.long_forms({std::string("long forms")});
+    fp1.required(true);
+    fp1.flag(true);
+    fp1.type(Type::INVALID);
+
+    ASSERT_EQ(fp1, fp1);
+    ASSERT_NE(fp1, fp2);
+
+    fp2.description("desc");
+    fp2.short_forms({std::string("short forms")});
+    fp2.long_forms({std::string("long forms")});
+    fp2.required(true);
+    fp2.flag(true);
+    fp2.type(Type::STRING);
+
+    ASSERT_NE(fp1, fp2);
+
+    fp1.type(Type::STRING);
+
+    ASSERT_EQ(fp1, fp2);
+}
+
 } // namespace internal
 } // namespace ahoy

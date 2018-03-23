@@ -55,6 +55,9 @@ class FormalParameter {
     Type type() const;
     void type(const Type type);
 
+    bool operator ==(const FormalParameter& other) const;
+    bool operator !=(const FormalParameter& other) const;
+
   private:
     std::string name_;
     std::string description_;
