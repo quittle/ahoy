@@ -49,7 +49,8 @@ bool Parameter::consume(std::list<std::string>& args) const {
         consumed = true;
     } else {
         const std::string& arg = args.front();
-        if (fp_.forms().count(arg)) {
+        const std::set<std::string>& forms = fp_.forms();
+        if (forms.count(arg)) {
             if (fp_.flag()) {
                 if (!Assign(storage_, fp_.type(), true)) {
                     return false;
@@ -63,6 +64,17 @@ bool Parameter::consume(std::list<std::string>& args) const {
                 args.pop_front();
                 args.pop_front();
                 consumed = true;
+            }
+        } else if (!fp_.flag()) {
+            for (const std::string& form : forms) {
+                if (arg.find(form + "=") == 0) {
+                    if (!Assign(storage_, fp_.type(), arg.substr(form.size() + 1))) {
+                        return false;
+                    }
+                    args.pop_front();
+                    consumed = true;
+                    break;
+                }
             }
         }
     }

@@ -107,6 +107,26 @@ TEST(Parameter, LongForms) {
     EXPECT_EQ(kValue, value);
 }
 
+TEST(Parameter, ConsumeEquals) {
+    std::string value;
+
+    const Parameter p(&value, ShortForms({"v"}));
+    const Parameter p_weird(&value, ShortForms({"criss=cross"}));
+
+    EXPECT_FALSE(consume(p, { "-v" }));
+    EXPECT_EQ("", value);
+
+    value = "a";
+    EXPECT_TRUE(consume(p, { "-v=" }));
+    EXPECT_EQ("", value);
+
+    EXPECT_TRUE(consume(p, { "-v==a=2==" }));
+    EXPECT_EQ("=a=2==", value);
+
+    EXPECT_TRUE(consume(p_weird, { "-criss=cross=apple=sauce" }));
+    EXPECT_EQ("apple=sauce", value);
+}
+
 TEST(Parameter, Flag) {
     std::string value;
 
