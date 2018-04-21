@@ -71,6 +71,24 @@ TEST(Parameter, Chaining) {
             p.then(p));
 }
 
+TEST(Parameter, Forms) {
+    std::string value;
+
+    const Parameter p(&value, Forms({"v"}));
+
+    EXPECT_FALSE(consume(p, {}));
+    EXPECT_EQ("", value);
+
+    EXPECT_FALSE(consume(p, { "v" }));
+    EXPECT_EQ("", value);
+
+    EXPECT_FALSE(consume(p, { "-o" }));
+    EXPECT_EQ("", value);
+
+    EXPECT_TRUE(consume(p, { "v", kValue }));
+    EXPECT_EQ(kValue, value);
+}
+
 TEST(Parameter, ShortForms) {
     std::string value;
 

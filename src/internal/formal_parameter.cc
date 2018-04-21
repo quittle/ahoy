@@ -25,6 +25,10 @@ void FormalParameter::description(const std::string& description) {
     description_ = description;
 }
 
+void FormalParameter::forms(const std::set<std::string>& forms) {
+    forms_.insert(forms.begin(), forms.end());
+}
+
 void FormalParameter::short_forms(const std::set<std::string>& short_forms) {
     for (const std::string& form : short_forms) {
         forms_.emplace("-" + form);

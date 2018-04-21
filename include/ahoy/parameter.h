@@ -111,6 +111,7 @@ class Parameter {
     bool operator !=(const Parameter& other) const;
 
   private:
+    _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Forms, forms)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::LongForms, long_forms)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::ShortForms, short_forms)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Name, name)

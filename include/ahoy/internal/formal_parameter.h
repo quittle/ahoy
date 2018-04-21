@@ -26,12 +26,18 @@ class FormalParameter {
     const std::string& description() const;
     void description(const std::string& description);
 
-    // A set of strings that represent the short forms of the parameter
-    // Example: -n, -name representing the name parameter
+    // A set of strings that represent the literal forms of the parameter and not modified for
+    // platform-specific standards
+    void forms(const std::set<std::string>& forms);
+
+    // A set of strings that represent the short forms of the parameter, which may be modified for
+    // platform-specific standards, like prefixing with '-' or '/' on unix or windows systems
+    // Example transformations: n -> -n, name -> -name
     void short_forms(const std::set<std::string>& short_forms);
 
-    // A set of strings that represent the long forms of the parameter
-    // Example: --name, --full-name representing the name parameter
+    // A set of strings that represent the long forms of the parameter, which may be modified for
+    // platform-specific standards, like prefixing with '--' or '/' on unix or windows systems
+    // Example transformations: name -> --name, full-name -> --full-name
     void long_forms(const std::set<std::string>& long_forms);
 
     const std::set<std::string>& forms() const;

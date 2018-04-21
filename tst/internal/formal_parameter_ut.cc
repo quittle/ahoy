@@ -1,13 +1,15 @@
-// Copyright (c) 2016 Dustin Toff
+// Copyright (c) 2016, 2018 Dustin Toff
 // Licensed under Apache License v2.0
 
 #include "ahoy/internal/formal_parameter.h"
 
+#include <algorithm>
 #include <set>
 #include <string>
 
 #include "ahoy/internal/type.h"
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 namespace {
@@ -54,6 +56,13 @@ TEST(FormalParameter, GetSet) {
 
     {
         FormalParameter fp;
+        EXPECT_NE(kForms, fp.forms());
+        fp.forms(kForms);
+        EXPECT_EQ(kForms, fp.forms());
+    }
+
+    {
+        FormalParameter fp;
         EXPECT_NE(kShortForms, fp.forms());
         fp.short_forms(kForms);
         EXPECT_EQ(kShortForms, fp.forms());
@@ -64,6 +73,28 @@ TEST(FormalParameter, GetSet) {
         EXPECT_NE(kLongForms, fp.forms());
         fp.long_forms(kForms);
         EXPECT_EQ(kLongForms, fp.forms());
+    }
+
+    {
+
+        FormalParameter fp;
+        fp.short_forms(kForms);
+        fp.forms(kForms);
+        fp.long_forms(kForms);
+
+        for (const std::string form : kForms) {
+            ASSERT_THAT(fp.forms(), ::testing::Contains(form));
+        }
+
+        for (const std::string form : kShortForms) {
+            ASSERT_THAT(fp.forms(), ::testing::Contains(form));
+        }
+
+        for (const std::string form : kLongForms) {
+            ASSERT_THAT(fp.forms(), ::testing::Contains(form));
+        }
+
+        ASSERT_EQ(fp.forms().size(), kForms.size() + kShortForms.size() + kLongForms.size());
     }
 
     {
