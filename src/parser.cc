@@ -4,12 +4,6 @@
 #include "ahoy/parser.h"
 
 #include <list>
-#include <locale>
-#include <sstream>
-#include <set>
-#include <utility>
-
-#include "ahoy/internal/assign.h"
 
 namespace ahoy {
 

@@ -5,13 +5,11 @@
 #define AHOY_AHOY_PARAMETER_H
 
 #include <list>
-#include <set>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "ahoy/options.h"
-#include "ahoy/internal/assign.h"
 #include "ahoy/internal/formal_parameter.h"
 #include "ahoy/internal/static_assert_helper.h"
 

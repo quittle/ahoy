@@ -3,6 +3,8 @@
 
 #include "ahoy/parameter.h"
 
+#include "ahoy/internal/assign.h"
+
 namespace {
 
 // Gets the nth element for a list

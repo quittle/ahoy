@@ -3,6 +3,11 @@
 
 // Include this file to include all public-facing APIs and classes
 
+#ifndef AHOY_AHOY_ALL_H
+#define AHOY_AHOY_ALL_H
+
 #include <ahoy/options.h>
 #include <ahoy/parameter.h>
 #include <ahoy/parser.h>
+
+#endif // AHOY_AHOY_ALL_H
