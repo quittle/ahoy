@@ -83,7 +83,9 @@ bool Parameter::consume(std::list<std::string>& args) const {
 
     if (consumed) {
         for (const Parameter& parameter : current_options_) {
-            parameter.consume(args);
+            if (!parameter.consume(args) && parameter.fp_.required()) {
+                return false;
+            }
         }
 
         if (next_options_.size() == 0) {
@@ -93,6 +95,8 @@ bool Parameter::consume(std::list<std::string>& args) const {
         for (const Parameter& parameter : next_options_) {
             if (parameter.consume(args)) {
                 return true;
+            } else if (parameter.fp_.required()) {
+                return false;
             }
         }
     }

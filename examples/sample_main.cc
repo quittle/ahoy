@@ -22,6 +22,7 @@ int main(const int argc, char const * const * const argv) {
                     ahoy::ShortForms({"i"}),
                     ahoy::LongForms({"iterations"}),
                     ahoy::Name("Iterations"),
+                    ahoy::Required(),
                     ahoy::Description("Number of times to run")),
             ahoy::Parameter(&verbose,
                     ahoy::ShortForms({"v"}),

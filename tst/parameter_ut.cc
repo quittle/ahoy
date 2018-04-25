@@ -71,6 +71,38 @@ TEST(Parameter, Chaining) {
             p.then(p));
 }
 
+TEST(Parameter, Required) {
+    std::string s1, s2;
+
+    Parameter p1(&s1, Required());
+    Parameter p2(&s2, Required());
+
+    EXPECT_FALSE(consume(p1, {}));
+    EXPECT_EQ("", s1);
+
+    EXPECT_TRUE(consume(p1, { kValue }));
+    EXPECT_EQ(kValue, s1);
+
+    std::string root_value;
+    Parameter root = Parameter(&root_value).withOptions(p1).then(p2);
+
+    EXPECT_FALSE(consume(root, {}));
+    EXPECT_FALSE(consume(root, { "a" }));
+    EXPECT_FALSE(consume(root, { "a", "b" }));
+    EXPECT_TRUE(consume(root, { "r", "a", "b" }));
+    EXPECT_EQ("r", root_value);
+    EXPECT_EQ("a", s1);
+    EXPECT_EQ("b", s2);
+
+    bool b(false);
+    root.withOptions(p1, Parameter(&b, Forms({"-b"}))).then(p2);
+    EXPECT_TRUE(consume(root, { "r", "a", "b" }));
+    EXPECT_EQ("r", root_value);
+    EXPECT_EQ("a", s1);
+    EXPECT_EQ("b", s2);
+    EXPECT_FALSE(b);
+}
+
 TEST(Parameter, Forms) {
     std::string value;
 
