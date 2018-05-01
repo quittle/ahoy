@@ -3,7 +3,7 @@
 
 #include "ahoy/parser.h"
 
-#include <list>
+#include <vector>
 
 namespace ahoy {
 
@@ -29,11 +29,11 @@ bool Parser::Parse(const int argc, char const * const argv[], std::string* progr
         ptr = &alternate;
     }
 
-    std::list<std::string> args(argv, argv + argc);
+    const std::vector<std::string> args(argv, argv + argc);
     Parameter root(ptr);
     root.withOptions(current_options_).then(next_options_);
-    const bool success = root.consume(args);
-    return success && args.size() == 0;
+
+    return root.consume(args) == static_cast<internal::size_t>(args.size());
 }
 
 const std::vector<Parameter>& Parser::current_options() const {

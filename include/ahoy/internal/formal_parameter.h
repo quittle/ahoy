@@ -54,6 +54,7 @@ class FormalParameter {
     bool flag() const;
     void flag(const bool flag);
 
+    // Shorthand for having no forms
     bool is_positional() const;
 
     // The variable type of the parameter

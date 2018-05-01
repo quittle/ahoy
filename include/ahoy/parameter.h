@@ -4,7 +4,6 @@
 #ifndef AHOY_AHOY_PARAMETER_H
 #define AHOY_AHOY_PARAMETER_H
 
-#include <list>
 #include <string>
 #include <utility>
 #include <vector>
@@ -56,6 +55,11 @@ class OptionChecker {
     }
 
 namespace ahoy {
+namespace internal {
+
+typedef long long size_t;
+
+} // namespace internal
 
 class Parameter {
    public:
@@ -95,10 +99,6 @@ class Parameter {
         return then({ std::forward<Parameter>(parameters)... });
     }
 
-    // Greedily consumes arguments and sets this and dependent parameter values, returning true if
-    // succesful. If unsuccessful, the value stored by the pointer passed in may be modified.
-    bool consume(std::list<std::string>& args) const;
-
     // Gets a reference to the current options vector
     const std::vector<Parameter>& current_options() const;
 
@@ -108,7 +108,16 @@ class Parameter {
     bool operator ==(const Parameter& other) const;
     bool operator !=(const Parameter& other) const;
 
+    // This is intended be consumed by Parser only
+    // Greedily consumes arguments and sets this and dependent parameter values, returning true if
+    // succesful. If unsuccessful, the value stored by the pointer passed in may be modified.
+    internal::size_t consume(const std::vector<std::string>& args,
+                             internal::size_t start = 0) const;
+
   private:
+    // Validate parameter configuration
+    bool is_valid() const;
+
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::Forms, forms)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::LongForms, long_forms)
     _AHOY_PARSER_BUILD_FORMAL_PARAMETER(ahoy::ShortForms, short_forms)

@@ -52,7 +52,7 @@ TEST(Parser, SingleNext) {
     std::string param;
 
     const Parser p = Parser().then(Parameter(&param));
-    EXPECT_FALSE(parse(p, {}));
+    EXPECT_TRUE(parse(p, {}));
     EXPECT_TRUE(parse(p, { kValue }));
     EXPECT_FALSE(parse(p, { kValue, kValue }));
     EXPECT_EQ(kValue, param);
@@ -63,8 +63,10 @@ TEST(Parser, OptionAndNext) {
     std::string then;
 
     const Parser p = Parser().withOptions(Parameter(&option)).then(Parameter(&then));
-    EXPECT_FALSE(parse(p, {}));
-    EXPECT_FALSE(parse(p, { kValue }));
+    EXPECT_TRUE(parse(p, {}));
+    EXPECT_TRUE(parse(p, { kValue }));
+    EXPECT_EQ(kValue, option);
+    EXPECT_EQ("", then);
     EXPECT_TRUE(parse(p, { kValue, kValue2 }));
     EXPECT_EQ(kValue, option);
     EXPECT_EQ(kValue2, then);

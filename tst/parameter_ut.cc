@@ -13,8 +13,8 @@ namespace {
 const char kValue[] = "value";
 const char kValue2[] = "value 2";
 
-bool consume(const ahoy::Parameter& parameter, std::list<std::string> args) {
-    return parameter.consume(args);
+bool consume(const ahoy::Parameter& parameter, std::vector<std::string> args) {
+    return static_cast<long>(args.size()) == parameter.consume(args);
 }
 
 } // namespace
@@ -96,11 +96,57 @@ TEST(Parameter, Required) {
 
     bool b(false);
     root.withOptions(p1, Parameter(&b, Forms({"-b"}))).then(p2);
-    EXPECT_TRUE(consume(root, { "r", "a", "b" }));
+    EXPECT_TRUE(consume(root, { "r", "s1", "s2" }));
     EXPECT_EQ("r", root_value);
-    EXPECT_EQ("a", s1);
-    EXPECT_EQ("b", s2);
+    EXPECT_EQ("s1", s1);
+    EXPECT_EQ("s2", s2);
     EXPECT_FALSE(b);
+
+    root.withOptions(p1, Parameter(&b, Forms({"-b"}), Required())).then(p2);
+    EXPECT_FALSE(consume(root, { "r", "s1", "s2" }));
+    EXPECT_EQ("r", root_value);
+    EXPECT_EQ("s1", s1);
+    EXPECT_EQ("s2", s2);
+    EXPECT_FALSE(b);
+
+    root.withOptions().then(p1);
+    EXPECT_FALSE(consume(root, {"r"}));
+
+    root.withOptions(p1).then();
+    EXPECT_FALSE(consume(root, {"r"}));
+}
+
+TEST(Parameter, Validity) {
+    std::string s;
+    const Parameter root = Parameter(&s).then(Parameter(&s, Required()), Parameter(&s, Required()));
+    EXPECT_FALSE(consume(root, {"r", "1", "2"}));
+}
+
+TEST(Parameter, Order) {
+    std::string root_param, option_a, option_b, then;
+
+    Parameter root = Parameter(&root_param).withOptions(
+            Parameter(&option_a, Forms({"-a"}), Required()),
+            Parameter(&option_b, Forms({"-b"})));
+
+    EXPECT_TRUE(consume(root, {"r", "-b=b", "-a", "a"}));
+    EXPECT_EQ("r", root_param);
+    EXPECT_EQ("a", option_a);
+    EXPECT_EQ("b", option_b);
+
+    root.then(Parameter(&then, Required()));
+
+    EXPECT_FALSE(consume(root, {"r2", "-b=b2", "-a", "a2"}));
+    EXPECT_EQ("r2", root_param);
+    EXPECT_EQ("a2", option_a);
+    EXPECT_EQ("b2", option_b);
+    EXPECT_EQ("", then);
+
+    EXPECT_TRUE(consume(root, {"r3", "-b=b3", "then", "-a", "a3"}));
+    EXPECT_EQ("r3", root_param);
+    EXPECT_EQ("a3", option_a);
+    EXPECT_EQ("b3", option_b);
+    EXPECT_EQ("then", then);
 }
 
 TEST(Parameter, Forms) {
