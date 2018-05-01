@@ -19,6 +19,6 @@ cc_library(
     # This can't use copts because when Ahoy is included as a third-party package, ahoy_internal
     # will fail to compile as the headers will no longer be in their expected place.
     includes = [ "include" ],
-    copts = CC_WARNINGS,
+    copts = CC_WARNINGS + [ "-O3" ],
     visibility = [ "//:__subpackages__" ],
 )
