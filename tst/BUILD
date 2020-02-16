@@ -5,11 +5,11 @@ load("//:internal.bzl", "CC_WARNINGS")
 
 cc_test(
     name = "unit_tests",
-    srcs = glob([ "**/*.cc" ]),
+    timeout = "short",
+    srcs = glob(["**/*.cc"]),
+    copts = CC_WARNINGS,
     deps = [
         "//:ahoy_internal",
         "@com_google_googletest//:gtest_main",
     ],
-    timeout = "short",
-    copts = CC_WARNINGS,
 )

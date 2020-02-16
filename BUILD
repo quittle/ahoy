@@ -3,22 +3,25 @@
 
 load(":internal.bzl", "CC_WARNINGS")
 
-AHOY_HEADERS = glob([ "include/**/*.h" ])
+AHOY_HEADERS = glob(["include/**/*.h"])
 
 cc_library(
     name = "ahoy",
-    deps = [ ":ahoy_internal" ],
     hdrs = AHOY_HEADERS,
-    visibility = [ "//visibility:public" ],
+    visibility = ["//visibility:public"],
+    deps = [":ahoy_internal"],
 )
 
 cc_library(
     name = "ahoy_internal",
-    srcs = glob([ "src/*", "src/**/*" ]),
+    srcs = glob([
+        "src/*",
+        "src/**/*",
+    ]),
     hdrs = AHOY_HEADERS,
+    copts = CC_WARNINGS + ["-O3"],
     # This can't use copts because when Ahoy is included as a third-party package, ahoy_internal
     # will fail to compile as the headers will no longer be in their expected place.
-    includes = [ "include" ],
-    copts = CC_WARNINGS + [ "-O3" ],
-    visibility = [ "//:__subpackages__" ],
+    includes = ["include"],
+    visibility = ["//:__subpackages__"],
 )
