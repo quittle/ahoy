@@ -15,12 +15,17 @@ ahoy::internal::size_t try_options(const std::vector<std::string>& args,
     bool parsed_something;
     do {
         parsed_something = false;
-        for (ahoy::Parameter const * const parameter : available_options) {
+        for (auto it = available_options.begin(); it != available_options.end();) {
+            ahoy::Parameter const * const parameter = *it;
             ahoy::internal::size_t consumption = parameter->consume(args, start + consumed);
             if (consumption > 0) {
-                available_options.erase(parameter);
+                // Incrementing must be done here to avoid `it` referencing a deleted entry
+                // Compiler optimizations may otherwise result in undefined behavior
+                available_options.erase(it++);
                 consumed += consumption;
                 parsed_something = true;
+            } else {
+                it++;
             }
         }
     } while (parsed_something);

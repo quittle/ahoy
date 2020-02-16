@@ -101,9 +101,9 @@ bool AssignShort(short * const pointer, const std::string& value) {
             return true;
         }
         return false;
-    } catch (std::invalid_argument) {
+    } catch (std::invalid_argument&) {
         return false;
-    } catch (std::out_of_range) {
+    } catch (std::out_of_range&) {
         return false;
     }
 }
@@ -121,9 +121,9 @@ bool AssignUShort(unsigned short * const pointer, const std::string& value) {
             return true;
         }
         return false;
-    } catch (std::invalid_argument) {
+    } catch (std::invalid_argument&) {
         return false;
-    } catch (std::out_of_range) {
+    } catch (std::out_of_range&) {
         return false;
     }
 }
@@ -136,9 +136,9 @@ bool AssignUShort(unsigned short * const pointer, const bool value) {
 bool AssignInt(int * const pointer, const std::string& value) {
     try {
         return assign(&std::stoi, pointer, value);
-    } catch (std::invalid_argument) {
+    } catch (std::invalid_argument&) {
         return false;
-    } catch (std::out_of_range) {
+    } catch (std::out_of_range&) {
         return false;
     }
 }
@@ -156,9 +156,9 @@ bool AssignUInt(uint * const pointer, const std::string& value) {
             return true;
         }
         return false;
-    } catch (std::invalid_argument) {
+    } catch (std::invalid_argument&) {
         return false;
-    } catch (std::out_of_range) {
+    } catch (std::out_of_range&) {
         return false;
     }
 }
@@ -171,9 +171,9 @@ bool AssignUInt(uint * const pointer, const bool value) {
 bool AssignLong(long * const pointer, const std::string& value) {
     try {
         return assign(&std::stol, pointer, value);
-    } catch (std::invalid_argument) {
+    } catch (std::invalid_argument&) {
         return false;
-    } catch (std::out_of_range) {
+    } catch (std::out_of_range&) {
         return false;
     }
 }
@@ -190,9 +190,9 @@ bool AssignULong(unsigned long * const pointer, const std::string& value) {
 
     try {
         return assign(&std::stoul, pointer, value);
-    } catch (std::invalid_argument) {
+    } catch (std::invalid_argument&) {
         return false;
-    } catch (std::out_of_range) {
+    } catch (std::out_of_range&) {
         return false;
     }
 }
@@ -205,9 +205,9 @@ bool AssignULong(unsigned long * const pointer, const bool value) {
 bool AssignLongLong(long long * const pointer, const std::string& value) {
     try {
         return assign(&std::stoll, pointer, value);
-    } catch (std::invalid_argument) {
+    } catch (std::invalid_argument&) {
         return false;
-    } catch (std::out_of_range) {
+    } catch (std::out_of_range&) {
         return false;
     }
 }
@@ -224,9 +224,9 @@ bool AssignULongLong(unsigned long long * const pointer, const std::string& valu
 
     try {
         return assign(&std::stoull, pointer, value) && *pointer <= ULLONG_MAX;
-    } catch (std::invalid_argument) {
+    } catch (std::invalid_argument&) {
         return false;
-    } catch (std::out_of_range) {
+    } catch (std::out_of_range&) {
         return false;
     }
 }
@@ -245,9 +245,9 @@ bool AssignFloat(float * const pointer, const std::string& value) {
             return false;
         }
         return true;
-    } catch (std::invalid_argument) {
+    } catch (std::invalid_argument&) {
         return false;
-    } catch (std::out_of_range) {
+    } catch (std::out_of_range&) {
         return false;
     }
 }
@@ -260,9 +260,9 @@ bool AssignFloat(float * const pointer, const bool value) {
 bool AssignDouble(double * const pointer, const std::string& value) {
     try {
         return assign(&std::stod, pointer, value);
-    } catch (std::invalid_argument) {
+    } catch (std::invalid_argument&) {
         return false;
-    } catch (std::out_of_range) {
+    } catch (std::out_of_range&) {
         return false;
     }
 }
@@ -275,9 +275,9 @@ bool AssignDouble(double * const pointer, const bool value) {
 bool AssignLongDouble(long double * const pointer, const std::string& value) {
     try {
         return assign(&std::stold, pointer, value);
-    } catch (std::invalid_argument) {
+    } catch (std::invalid_argument&) {
         return false;
-    } catch (std::out_of_range) {
+    } catch (std::out_of_range&) {
         return false;
     }
 }

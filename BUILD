@@ -5,7 +5,7 @@ load(":internal.bzl", "CC_WARNINGS")
 
 AHOY_HEADERS = glob([ "include/**/*.h" ])
 
-cc_inc_library(
+cc_library(
     name = "ahoy",
     deps = [ ":ahoy_internal" ],
     hdrs = AHOY_HEADERS,
