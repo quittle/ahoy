@@ -1,0 +1,26 @@
+# Copyright (c) 2026 Dustin Toff
+# Licensed under Apache License v2.0
+
+name: Build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      # Bazel version comes from .bazelversion (2.1.0).
+      - uses: bazel-contrib/setup-bazel@0.19.1
+        with:
+          bazelisk-version: 1.x
+          bazelisk-cache: true
+      - name: Build
+        run: bazel build ...
+      - name: Test
+        run: bazel test ...
