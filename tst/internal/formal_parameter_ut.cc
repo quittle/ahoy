@@ -82,15 +82,15 @@ TEST(FormalParameter, GetSet) {
         fp.forms(kForms);
         fp.long_forms(kForms);
 
-        for (const std::string form : kForms) {
+        for (const std::string& form : kForms) {
             ASSERT_THAT(fp.forms(), ::testing::Contains(form));
         }
 
-        for (const std::string form : kShortForms) {
+        for (const std::string& form : kShortForms) {
             ASSERT_THAT(fp.forms(), ::testing::Contains(form));
         }
 
-        for (const std::string form : kLongForms) {
+        for (const std::string& form : kLongForms) {
             ASSERT_THAT(fp.forms(), ::testing::Contains(form));
         }
 
